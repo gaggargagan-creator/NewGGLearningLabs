@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GG LearnLabs | Training Effectiveness</title>
+  <meta name="description" content="Assess training effectiveness using weighted L&D measures.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="grid"></div>
+  <header class="topbar">
+    <a href="#" class="brand">GG <span>LearnLabs</span></a>
+    <button class="ghost" id="howItWorks">How it works</button>
+  </header>
+
+  <main class="shell">
+    <section id="home" class="hero">
+      <div class="eyebrow">TRAINING EFFECTIVENESS WORKSPACE</div>
+      <h1>Measure what happened.<br><em>Understand what to improve.</em></h1>
+      <p>Assess a training program across five critical measures, calculate overall effectiveness, identify gaps and generate a practical recommendation.</p>
+      <button class="primary" id="startAssessment">Start Training Assessment <span>→</span></button>
+
+      <div class="measure-preview">
+        <div><b>35%</b><span>Trainer</span></div>
+        <div><b>20%</b><span>Feedback</span></div>
+        <div><b>15%</b><span>Knowledge</span></div>
+        <div><b>20%</b><span>Application</span></div>
+        <div><b>10%</b><span>Completion</span></div>
+      </div>
+    </section>
+
+    <section id="assessment" class="hidden">
+      <div class="progress-wrap">
+        <div class="step-label"><span id="stepNumber">01</span> / 02 — <span id="stepName">PROGRAM CONTEXT</span></div>
+        <div class="progress"><i id="progressBar"></i></div>
+      </div>
+
+      <form id="assessmentForm">
+        <div id="step1" class="step active">
+          <div class="section-intro">
+            <div class="eyebrow">PROGRAM CONTEXT</div>
+            <h2>What are we assessing?</h2>
+            <p>These details identify the assessment and appear in your final report.</p>
+          </div>
+
+          <div class="form-grid">
+            <label class="full">Training / Program Name
+              <input id="programName" placeholder="e.g. Leadership Development Program" required>
+            </label>
+            <label>Trainer Name
+              <input id="trainerName" placeholder="e.g. Nikita Tandi">
+            </label>
+            <label>Department / Business Unit
+              <input id="department" placeholder="e.g. Operations">
+            </label>
+            <label>Training Date
+              <input id="trainingDate" type="date">
+            </label>
+            <label>Number of Participants
+              <input id="participants" type="number" min="1" placeholder="e.g. 25">
+            </label>
+          </div>
+          <div class="actions right">
+            <button type="button" class="primary" id="toStep2">Continue <span>→</span></button>
+          </div>
+        </div>
+
+        <div id="step2" class="step">
+          <div class="section-intro">
+            <div class="eyebrow">EFFECTIVENESS MEASURES</div>
+            <h2>How did the training perform?</h2>
+            <p>Score each measure from 0 to 100. The weighted contribution is calculated automatically.</p>
+          </div>
+
+          <div id="measureCards" class="measure-cards"></div>
+
+          <div class="actions">
+            <button type="button" class="ghost" id="backToStep1">← Back</button>
+            <button type="submit" class="primary">Generate Assessment <span>→</span></button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section id="results" class="hidden">
+      <div class="results-head">
+        <div>
+          <div class="eyebrow">TRAINING EFFECTIVENESS REPORT</div>
+          <h2 id="resultProgram">Your Assessment</h2>
+          <p id="resultMeta"></p>
+        </div>
+        <button class="ghost" id="newAssessment">New Assessment</button>
+      </div>
+
+      <div class="hero-result card">
+        <div class="gauge" id="gauge">
+          <div class="gauge-inner">
+            <strong id="overallScore">0.00</strong>
+            <span>% EFFECTIVENESS</span>
+          </div>
+        </div>
+        <div class="rating-copy">
+          <div id="ratingBadge" class="rating">SATISFACTORY</div>
+          <h3 id="ratingHeadline">A balanced result with room to improve.</h3>
+          <p id="ratingDescription"></p>
+          <div id="whyResult" class="why-result"></div>
+        </div>
+      </div>
+
+      <div class="metrics-grid" id="metricsGrid"></div>
+
+      <div class="insight-grid">
+        <article class="card insight strong-card">
+          <div class="mini-label">🏆 STRONGEST AREA</div>
+          <h3 id="strongestArea"></h3>
+          <div class="big-score" id="strongestScore"></div>
+          <p id="strongestText"></p>
+        </article>
+
+        <article class="card insight weak-card">
+          <div class="mini-label">⚠️ AREA REQUIRING MOST ATTENTION</div>
+          <h3 id="weakestArea"></h3>
+          <div class="big-score" id="weakestScore"></div>
+          <p id="weakestText"></p>
+        </article>
+      </div>
+
+      <section class="card priority-card">
+        <div class="mini-label">🎯 PRIORITY AREAS TO IMPROVE</div>
+        <div id="priorityAreas"></div>
+      </section>
+
+      <section class="card recommendation-card">
+        <div class="mini-label">💡 SMART RECOMMENDATION</div>
+        <h3 id="recommendationTitle"></h3>
+        <p id="recommendationText"></p>
+      </section>
+
+      <section class="method card">
+        <button class="method-toggle" id="methodToggle">
+          <span>How is this calculated?</span><span>+</span>
+        </button>
+        <div id="methodContent" class="method-content">
+          <p><b>Overall Effectiveness</b> is a weighted score based on:</p>
+          <div class="formula">
+            Trainer Observation × 35% + Participant Feedback × 20% + Knowledge Assessment × 15% + Learning Application × 20% + Attendance / Completion × 10%
+          </div>
+          <p>The final rating also considers critical thresholds for overall performance, trainer observation and learning application.</p>
+        </div>
+      </section>
+
+      <div class="report-actions">
+        <button class="ghost" id="editAssessment">← Edit Assessment</button>
+        <button class="primary" id="exportPDF">Export Report as PDF ↓</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>GG LearnLabs · Training Effectiveness Assessment · Built for practical L&amp;D decisions</footer>
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
