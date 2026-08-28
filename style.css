@@ -1636,3 +1636,611 @@ body.light-mode .grid {
   }
 
 }
+/* =====================================================
+   GG LEARNLABS — DARK / LIGHT MODE
+===================================================== */
+
+
+/* ---------- DEFAULT: DARK MODE ---------- */
+
+:root {
+  --bg: #091111;
+  --panel: #101b1b;
+  --panel2: #132121;
+
+  --text: #edf4f2;
+  --muted: #91a3a0;
+
+  --line: rgba(188, 220, 214, 0.13);
+
+  --teal: #55dfc7;
+  --amber: #f2b75e;
+  --blue: #6ea9ff;
+  --red: #ff7070;
+
+  --card-bg-1: rgba(255, 255, 255, 0.055);
+  --card-bg-2: rgba(255, 255, 255, 0.015);
+
+  --input-bg: rgba(0, 0, 0, 0.17);
+
+  --bar-bg: rgba(255, 255, 255, 0.08);
+
+  --formula-bg: rgba(0, 0, 0, 0.18);
+
+  --gauge-inner: #0c1716;
+
+  --footer-color: #60716f;
+
+  --glow-left: #15312e;
+  --glow-right: #2b2115;
+}
+
+
+/* =====================================================
+   LIGHT MODE
+===================================================== */
+
+body.light-mode {
+  --bg: #f3f7f6;
+  --panel: #ffffff;
+  --panel2: #f7fbfa;
+
+  --text: #172522;
+  --muted: #62736f;
+
+  --line: rgba(23, 53, 47, 0.15);
+
+  --teal: #168c7d;
+  --amber: #c88722;
+  --blue: #4879bb;
+  --red: #c65b5b;
+
+  --card-bg-1: rgba(255, 255, 255, 0.98);
+  --card-bg-2: rgba(240, 246, 244, 0.98);
+
+  --input-bg: #ffffff;
+
+  --bar-bg: #dce7e4;
+
+  --formula-bg: #f2f7f5;
+
+  --gauge-inner: #ffffff;
+
+  --footer-color: #6d7c79;
+
+  --glow-left: #d8f0eb;
+  --glow-right: #f5ead9;
+}
+
+
+/* =====================================================
+   BODY
+===================================================== */
+
+body {
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      var(--glow-left) 0,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 30%,
+      var(--glow-right) 0,
+      transparent 26%
+    ),
+    var(--bg);
+
+  color: var(--text);
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.grid {
+  transition: opacity 0.35s ease;
+}
+
+body.light-mode .grid {
+  opacity: 0.10;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.topbar {
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
+}
+
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+
+/*
+  IMPORTANT:
+
+  The logo file contains dark elements.
+  Therefore we give it a proper light surface in BOTH
+  dark mode and light mode.
+
+  This makes the logo clearly visible.
+*/
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 220px;
+  height: 70px;
+
+  padding: 10px 16px;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(85, 223, 199, 0.28);
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 8px 30px
+    rgba(0, 0, 0, 0.12);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+
+.logo-box:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, 0.16);
+}
+
+
+.brand-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+
+  object-position: center;
+}
+
+
+/* Remove conflict from old logo CSS */
+
+.brand img {
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+
+/* =====================================================
+   THEME TOGGLE
+===================================================== */
+
+.theme-toggle {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  height: 56px;
+
+  padding: 0 14px;
+
+  border-radius: 999px;
+
+  border:
+    1px solid
+    rgba(85, 223, 199, 0.40);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color: var(--text);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+body.light-mode .theme-toggle {
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 20px
+    rgba(23, 53, 47, 0.08);
+}
+
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--teal);
+}
+
+
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+
+
+.theme-symbol {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  font-size: 18px;
+
+  line-height: 1;
+
+  color: var(--muted);
+
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+
+/* Dark mode */
+
+body:not(.light-mode) .moon {
+  color: var(--teal);
+
+  transform: scale(1.12);
+}
+
+
+/* Light mode */
+
+body.light-mode .sun {
+  color: var(--amber);
+
+  transform: scale(1.12);
+}
+
+
+/* =====================================================
+   SWITCH
+===================================================== */
+
+.switch-track {
+  position: relative;
+
+  display: block;
+
+  width: 58px;
+  height: 30px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
+}
+
+
+.switch-thumb {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: var(--teal);
+
+  box-shadow:
+    0 3px 10px
+    rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 0.35s cubic-bezier(.4, 0, .2, 1),
+    background 0.35s ease;
+}
+
+
+/* Light mode switch */
+
+body.light-mode .switch-track {
+  background: var(--teal);
+
+  border-color: var(--teal);
+}
+
+
+body.light-mode .switch-thumb {
+  transform: translateX(28px);
+
+  background: #ffffff;
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.measure-preview div,
+.card {
+  background:
+    linear-gradient(
+      135deg,
+      var(--card-bg-1),
+      var(--card-bg-2)
+    );
+
+  border-color: var(--line);
+
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+body.light-mode .card,
+body.light-mode .measure-preview div {
+  box-shadow:
+    0 8px 30px
+    rgba(23, 53, 47, 0.05);
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.ghost {
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  color: var(--text);
+
+  border-color: var(--line);
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+body.light-mode .ghost {
+  background: #ffffff;
+}
+
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+input {
+  background: var(--input-bg);
+
+  color: var(--text);
+
+  border-color: var(--line);
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+body.light-mode input[type="date"] {
+  color-scheme: light;
+}
+
+
+body:not(.light-mode) input[type="date"] {
+  color-scheme: dark;
+}
+
+
+/* =====================================================
+   GAUGE
+===================================================== */
+
+.gauge-inner {
+  background: var(--gauge-inner);
+
+  transition:
+    background 0.35s ease;
+}
+
+
+/* =====================================================
+   BARS
+===================================================== */
+
+.bar {
+  background: var(--bar-bg);
+}
+
+
+/* =====================================================
+   SLIDER
+===================================================== */
+
+.slider {
+  background:
+    linear-gradient(
+      to right,
+      var(--teal) 0%,
+      var(--teal) var(--fill),
+      var(--bar-bg) var(--fill),
+      var(--bar-bg) 100%
+    );
+}
+
+
+/* =====================================================
+   FORMULA
+===================================================== */
+
+.formula {
+  background: var(--formula-bg);
+
+  color: var(--teal);
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+  color: var(--footer-color);
+
+  transition:
+    color 0.35s ease;
+}
+
+
+/* =====================================================
+   LIGHT MODE TEXT
+===================================================== */
+
+body.light-mode .hero > p,
+body.light-mode .section-intro p,
+body.light-mode .rating-copy > p,
+body.light-mode .results-head p,
+body.light-mode .insight p,
+body.light-mode .recommendation-card p {
+  color: var(--muted);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 800px) {
+
+  .topbar {
+    padding: 18px;
+  }
+
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+
+  .logo-box {
+    width: 175px;
+    height: 58px;
+
+    padding: 8px 12px;
+
+    border-radius: 15px;
+  }
+
+
+  .theme-toggle {
+    width: 56px;
+
+    padding: 0;
+
+    gap: 0;
+  }
+
+
+  .theme-symbol {
+    display: none;
+  }
+
+
+  .switch-track {
+    width: 46px;
+  }
+
+
+  body.light-mode .switch-thumb {
+    transform: translateX(16px);
+  }
+
+}
+
+
+@media (max-width: 550px) {
+
+  .logo-box {
+    width: 140px;
+    height: 50px;
+  }
+
+
+  #howItWorks {
+    display: none;
+  }
+
+}
