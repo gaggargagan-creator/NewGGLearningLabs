@@ -10,9 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- html2pdf.js: primary CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <style>
+<style>
     :root{
       --bg:#091111;
       --panel:#101b1b;
@@ -193,9 +191,8 @@
     footer{padding:30px 0 0;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}
 
     /* =========================================================
-       ONE-PAGE PDF REPORT
-       Fixed A4 ratio: 794 x 1123 CSS px
-       Designed as an executive L&D infographic.
+       ONE-PAGE PDF CAPTURE
+       Dedicated A4-ratio canvas: 794 x 1123 CSS pixels.
     ========================================================= */
 
     #pdfReport{
@@ -211,6 +208,11 @@
       font-family:Arial,Helvetica,sans-serif;
     }
 
+    body.pdf-exporting{
+      background:#ffffff !important;
+      overflow:hidden !important;
+    }
+
     body.pdf-exporting > .page,
     body.pdf-exporting > .grid{
       display:none !important;
@@ -218,6 +220,11 @@
 
     body.pdf-exporting > #pdfReport{
       display:block !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      position:relative !important;
+      left:0 !important;
+      top:0 !important;
     }
 
     .pdf-onepage{
@@ -226,10 +233,9 @@
       padding:34px 36px 28px;
       display:flex;
       flex-direction:column;
+      overflow:hidden;
       background:
-        radial-gradient(circle at 8% 0%,#e8f6f2,transparent 25%),
-        radial-gradient(circle at 98% 8%,#fff2dd,transparent 23%),
-        #f8fbfa;
+        linear-gradient(135deg,#edf8f5 0%,#f8fbfa 45%,#fff6e8 100%);
     }
 
     .pdf-header{
@@ -246,11 +252,16 @@
       gap:12px;
     }
 
-    .pdf-brand img{
-      width:126px;
-      height:40px;
-      object-fit:contain;
-      object-position:left center;
+    .pdf-brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      background:#173a35;
+      color:#55dfc7;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font:bold 15px Arial,sans-serif;
     }
 
     .pdf-kicker{
@@ -320,17 +331,6 @@
       overflow:hidden;
     }
 
-    .pdf-score-card::after{
-      content:"";
-      position:absolute;
-      width:120px;
-      height:120px;
-      border-radius:50%;
-      right:-48px;
-      top:-48px;
-      background:rgba(85,223,199,.12);
-    }
-
     .pdf-score-label{
       font:bold 8px Arial,sans-serif;
       letter-spacing:1.2px;
@@ -354,7 +354,6 @@
       margin-top:11px;
       padding:5px 9px;
       border-radius:999px;
-      background:#55dfc7;
       color:#06201c;
       font:bold 8px Arial,sans-serif;
       letter-spacing:.8px;
@@ -462,7 +461,6 @@
 
     .pdf-bar-fill{
       height:100%;
-      background:#178f7f;
       border-radius:inherit;
     }
 
@@ -528,7 +526,7 @@
       border-radius:12px;
       background:#fff;
       padding:12px 13px;
-      min-height:127px;
+      min-height:111px;
     }
 
     .pdf-box-title{
@@ -585,7 +583,7 @@
       border:1px solid #dce6e3;
       border-radius:10px;
       padding:9px 10px;
-      min-height:64px;
+      min-height:58px;
     }
 
     .pdf-note-title{
@@ -773,7 +771,7 @@
 
       <div class="footer-actions">
         <button class="btn" id="editButton" type="button">← Edit Observation</button>
-        <button class="btn btn-primary" id="exportButton" type="button" title="Generate and download a one-page PDF">Export TOF Report as PDF ↓</button>
+        <button class="btn btn-primary" id="exportButton" type="button">Export TOF Report as PDF ↓</button>
       </div>
     </section>
 
@@ -1085,45 +1083,50 @@
       const focusCount = resultSections.filter(s => s.score !== null && s.score < 85).length;
 
       const scoreColor =
-        overall.score >= 90 ? "#178f7f" :
-        overall.score >= 80 ? "#178f7f" :
-        overall.score >= 70 ? "#c98518" : "#c75a5a";
+        overall.score >= 85 ? "#178f7f" :
+        overall.score >= 70 ? "#c98518" :
+        "#c75a5a";
 
-      const sectionBars = resultSections.map(section => `
-        <div class="pdf-bar-item">
-          <div class="pdf-bar-name">${esc(section.name.replace(/^[0-9.]+\\s*/, ""))}</div>
-          <div class="pdf-bar-track">
-            <div class="pdf-bar-fill" style="width:${section.score === null ? 0 : section.score}%;background:${section.score !== null && section.score < 70 ? "#c75a5a" : section.score !== null && section.score < 85 ? "#c98518" : "#178f7f"}"></div>
+      const barHtml = resultSections.map(section => {
+        const score = section.score === null ? 0 : section.score;
+        const fill = score >= 85 ? "#178f7f" : score >= 70 ? "#c98518" : "#c75a5a";
+
+        return `
+          <div class="pdf-bar-item">
+            <div class="pdf-bar-name">${esc(section.name.replace(/^[0-9.]+\s*/, ""))}</div>
+            <div class="pdf-bar-track">
+              <div class="pdf-bar-fill" style="width:${score}%;background:${fill}"></div>
+            </div>
+            <div class="pdf-bar-value">${section.score === null ? "N/A" : section.score.toFixed(1) + "%"}</div>
           </div>
-          <div class="pdf-bar-value">${section.score === null ? "N/A" : section.score.toFixed(1) + "%"}</div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
 
-      const strengthItems = resultSections
+      const strengths = resultSections
         .filter(s => s.score !== null && s.score >= 90)
         .sort((a,b)=>b.score-a.score)
         .slice(0,3);
 
-      const developmentItems = resultSections
+      const development = resultSections
         .filter(s => s.score !== null && s.score < 85)
         .sort((a,b)=>a.score-b.score)
         .slice(0,3);
 
-      const strengthList = strengthItems.length
-        ? strengthItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+      const strengthList = strengths.length
+        ? strengths.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
         : "<li>No section crossed the 90% strength threshold.</li>";
 
-      const developmentList = developmentItems.length
-        ? developmentItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+      const developmentList = development.length
+        ? development.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
         : "<li>No section is below the 85% development threshold.</li>";
 
       const notes = [
         ["Strength Evidence", $("strengthComments").value.trim()],
         ["Development Evidence", $("developmentComments").value.trim()],
-        ["Final Observer Comments", $("overallComments").value.trim()]
-      ].filter(([,text]) => text);
+        ["Observer Comments", $("overallComments").value.trim()]
+      ].filter(([,text])=>text).slice(0,3);
 
-      const noteBlocks = notes.slice(0,3).map(([title,text]) => `
+      const noteBlocks = notes.map(([title,text])=>`
         <div class="pdf-note">
           <div class="pdf-note-title">${esc(title)}</div>
           <div class="pdf-note-text">${esc(text).replace(/\n/g,"<br>")}</div>
@@ -1135,9 +1138,9 @@
 
           <div class="pdf-header">
             <div class="pdf-brand">
-              <img src="logo.png" alt="GG LearnLabs">
+              <div class="pdf-brand-mark">GG</div>
               <div>
-                <div class="pdf-kicker">Learning &amp; Development</div>
+                <div class="pdf-kicker">GG LearnLabs · Learning &amp; Development</div>
                 <div class="pdf-title">Trainer Observation Report</div>
               </div>
             </div>
@@ -1163,8 +1166,8 @@
               <div class="pdf-meta-value">${esc($("classTopic").value.trim() || "—")}</div>
             </div>
             <div class="pdf-meta-box">
-              <div class="pdf-meta-label">Criteria</div>
-              <div class="pdf-meta-value">36 observation points</div>
+              <div class="pdf-meta-label">Observation Points</div>
+              <div class="pdf-meta-value">36 criteria</div>
             </div>
           </div>
 
@@ -1203,24 +1206,24 @@
             <span>Y / (Y + N) · N/A excluded</span>
           </div>
 
-          <div class="pdf-bars">${sectionBars}</div>
+          <div class="pdf-bars">${barHtml}</div>
 
           <div class="pdf-insight-grid">
             <div class="pdf-insight green">
               <div class="pdf-insight-label">Strongest Section</div>
-              <div class="pdf-insight-title">${esc((strongest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-title">${esc((strongest?.name || "—").replace(/^[0-9.]+\s*/, ""))}</div>
               <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1) + "%" : "—"}</div>
             </div>
 
             <div class="pdf-insight amber">
               <div class="pdf-insight-label">Development Priority</div>
-              <div class="pdf-insight-title">${esc((weakest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-title">${esc((weakest?.name || "—").replace(/^[0-9.]+\s*/, ""))}</div>
               <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1) + "%" : "—"}</div>
             </div>
 
             <div class="pdf-insight blue">
               <div class="pdf-insight-label">Observation Coverage</div>
-              <div class="pdf-insight-title">${overall.denominator} applicable criteria scored</div>
+              <div class="pdf-insight-title">${overall.denominator} applicable criteria</div>
               <div class="pdf-insight-score">${overall.na} N/A</div>
             </div>
           </div>
@@ -1230,7 +1233,6 @@
               <div class="pdf-box-title">Observed Strengths</div>
               <ul class="pdf-list">${strengthList}</ul>
             </div>
-
             <div class="pdf-box">
               <div class="pdf-box-title">Development Focus</div>
               <ul class="pdf-list">${developmentList}</ul>
@@ -1254,44 +1256,65 @@
       `;
     }
 
-    async function ensureHtml2Pdf(){
-      if(typeof window.html2pdf === "function"){
+    async function ensurePdfLibraries(){
+      if(typeof window.html2canvas === "function" && window.jspdf && typeof window.jspdf.jsPDF === "function"){
         return true;
       }
 
-      const sources = [
-        "https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      const libraries = [
+        {
+          globalReady: () => typeof window.html2canvas === "function",
+          urls: [
+            "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+            "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+          ]
+        },
+        {
+          globalReady: () => window.jspdf && typeof window.jspdf.jsPDF === "function",
+          urls: [
+            "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+            "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"
+          ]
+        }
       ];
 
-      for(const source of sources){
-        const loaded = await new Promise(resolve => {
-          const script = document.createElement("script");
-          script.src = source;
-          script.async = true;
+      for(const lib of libraries){
+        if(lib.globalReady()) continue;
 
-          let settled = false;
+        let loaded = false;
 
-          const finish = value => {
-            if(settled) return;
-            settled = true;
-            resolve(value);
-          };
+        for(const source of lib.urls){
+          loaded = await new Promise(resolve=>{
+            const script = document.createElement("script");
+            script.src = source;
+            script.async = true;
 
-          script.onload = () => finish(true);
-          script.onerror = () => finish(false);
+            let settled = false;
+            const finish = ok=>{
+              if(settled) return;
+              settled = true;
+              resolve(ok);
+            };
 
-          document.head.appendChild(script);
+            script.onload = ()=>finish(true);
+            script.onerror = ()=>finish(false);
 
-          setTimeout(() => finish(false), 12000);
-        });
+            document.head.appendChild(script);
 
-        if(loaded && typeof window.html2pdf === "function"){
-          return true;
+            setTimeout(()=>finish(false),12000);
+          });
+
+          if(loaded && lib.globalReady()){
+            break;
+          }
+        }
+
+        if(!lib.globalReady()){
+          return false;
         }
       }
 
-      return false;
+      return true;
     }
 
     async function exportPDF(){
@@ -1303,27 +1326,22 @@
         button.disabled = true;
         button.textContent = "Preparing 1-page PDF...";
 
-        const loaded = await ensureHtml2Pdf();
+        const loaded = await ensurePdfLibraries();
 
-        if(!loaded || typeof window.html2pdf !== "function"){
-          throw new Error("html2pdf.js failed to load.");
+        if(!loaded){
+          throw new Error("PDF libraries failed to load.");
         }
 
         buildPdfReport();
 
-        /*
-          html2canvas must be able to see the report. Keep the report in normal
-          document flow and temporarily hide the application UI.
-        */
+        // The capture target must be visible and measurable.
         document.body.classList.add("pdf-exporting");
         report.style.display = "block";
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve=>setTimeout(resolve,300));
 
         if(document.fonts && document.fonts.ready){
-          try{
-            await document.fonts.ready;
-          }catch(_){}
+          try{ await document.fonts.ready; }catch(_){}
         }
 
         await new Promise(resolve =>
@@ -1332,48 +1350,63 @@
           )
         );
 
+        const canvas = await window.html2canvas(report, {
+          scale: 2,
+          backgroundColor: "#f8fbfa",
+          useCORS: false,
+          allowTaint: false,
+          logging: false,
+          imageTimeout: 0,
+          removeContainer: true,
+          width: 794,
+          height: 1123,
+          windowWidth: 794,
+          windowHeight: 1123,
+          scrollX: 0,
+          scrollY: 0
+        });
+
+        if(!canvas || canvas.width < 100 || canvas.height < 100){
+          throw new Error("html2canvas returned an invalid canvas.");
+        }
+
+        const imageData = canvas.toDataURL("image/jpeg",0.98);
+
+        if(!imageData || imageData.length < 5000){
+          throw new Error("Rendered PDF image was empty.");
+        }
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF({
+          orientation:"portrait",
+          unit:"mm",
+          format:"a4",
+          compress:true
+        });
+
+        pdf.addImage(
+          imageData,
+          "JPEG",
+          0,
+          0,
+          210,
+          297,
+          undefined,
+          "FAST"
+        );
+
         const filename =
           `${safeFileName($("trainerName").value || "trainer")}_TOF_one-page_${safeFileName($("classTopic").value || "observation")}.pdf`;
 
-        const worker = window.html2pdf()
-          .set({
-            margin: 0,
-            filename,
-            image:{
-              type:"jpeg",
-              quality:0.98
-            },
-            html2canvas:{
-              scale:2,
-              useCORS:true,
-              allowTaint:false,
-              backgroundColor:"#f8fbfa",
-              logging:true,
-              scrollX:0,
-              scrollY:0,
-              width:794,
-              height:1123,
-              windowWidth:794,
-              windowHeight:1123
-            },
-            jsPDF:{
-              unit:"mm",
-              format:"a4",
-              orientation:"portrait",
-              compress:true
-            }
-          })
-          .from(report);
-
         /*
-          Generate the PDF as a Blob first, then trigger the browser download
-          ourselves. This separates PDF generation from the library's save()
-          helper and gives us a real Blob to validate.
+          Use a real Blob + temporary anchor instead of relying on any
+          html2pdf download helper.
         */
-        const pdfBlob = await worker.outputPdf("blob");
+        const pdfBlob = pdf.output("blob");
 
-        if(!pdfBlob || pdfBlob.size < 1000){
-          throw new Error("PDF blob was empty or invalid.");
+        if(!pdfBlob || pdfBlob.size < 5000){
+          throw new Error("Generated PDF blob was empty.");
         }
 
         const blobUrl = URL.createObjectURL(pdfBlob);
@@ -1384,19 +1417,19 @@
         downloadLink.style.display = "none";
 
         document.body.appendChild(downloadLink);
-        downloadLink.click();
 
-        setTimeout(() => {
-          downloadLink.remove();
-          URL.revokeObjectURL(blobUrl);
-        }, 1000);
+        // Append, click, and remove in the same user-gesture task.
+        downloadLink.click();
+        downloadLink.remove();
+
+        setTimeout(()=>URL.revokeObjectURL(blobUrl),1000);
 
         button.textContent = "1-page PDF Downloaded ✓";
 
-        setTimeout(() => {
+        setTimeout(()=>{
           button.textContent = originalText;
           button.disabled = false;
-        }, 2200);
+        },2200);
 
       }catch(error){
         console.error("TOF PDF export error:",error);
@@ -1405,7 +1438,7 @@
         button.disabled = false;
 
         alert(
-          "PDF export failed. Please refresh the page and try again. Check the browser console for the exact export error."
+          "PDF export failed. Please refresh the page and try again."
         );
 
       }finally{
