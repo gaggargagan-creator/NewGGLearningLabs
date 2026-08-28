@@ -2,147 +2,135 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>GG LearnLabs | L1 Feedback Analyzer</title>
-<meta name="description" content="Analyze Level 1 training feedback and generate a management-ready L&D report.">
+<meta name="description" content="Universal Level 1 learner feedback analyzer for L&D teams. Upload any feedback spreadsheet and get instant analysis.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<!-- Browser-side spreadsheet parser -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#091111;--panel:#101b1b;--panel2:#132121;--text:#edf4f2;--heading:#f5faf8;
   --muted:#91a3a0;--line:rgba(188,220,214,.14);--teal:#55dfc7;--amber:#f2b75e;
-  --blue:#6ea9ff;--red:#ff7070;--green:#4fc3a5;
+  --blue:#6ea9ff;--red:#ff7070;
 }
 html[data-theme="light"]{
-  --bg:#f4f7f6;--panel:#fff;--panel2:#f6faf8;--text:#182725;--heading:#172522;
+  --bg:#f4f7f6;--panel:#fff;--panel2:#f7faf9;--text:#182725;--heading:#172522;
   --muted:#647571;--line:rgba(24,54,49,.14);--teal:#168c7b;--amber:#c98518;
-  --blue:#4778ba;--red:#c85656;--green:#168c7b;
+  --blue:#4778ba;--red:#c85656;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{
   margin:0;min-height:100vh;color:var(--text);font-family:Inter,Arial,sans-serif;
   background:
     radial-gradient(circle at 8% 0%,color-mix(in srgb,var(--teal) 14%,transparent),transparent 28%),
-    radial-gradient(circle at 95% 20%,color-mix(in srgb,var(--amber) 10%,transparent),transparent 24%),var(--bg);
+    radial-gradient(circle at 95% 15%,color-mix(in srgb,var(--amber) 10%,transparent),transparent 25%),
+    var(--bg);
 }
-.grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.17;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 88%)}
-.page{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 26px 80px}
+body.pdf-exporting{background:#fff!important;overflow:hidden!important}
+body.pdf-exporting>.app-shell,body.pdf-exporting>.grid{display:none!important}
+.grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.16;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 88%)}
+.app-shell{position:relative;z-index:1;max-width:1220px;margin:0 auto;padding:0 26px 70px}
 header{min-height:88px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{display:flex;align-items:center;text-decoration:none;color:var(--text);font-weight:700;letter-spacing:-.04em;font-size:21px}
-.brand span{font-family:Fraunces,serif;font-weight:600}
-.head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn{min-height:44px;padding:11px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:600 13px Inter,sans-serif;cursor:pointer;text-decoration:none;transition:.18s}
-.btn:hover{border-color:var(--teal);transform:translateY(-1px)}
-.btn-primary{background:var(--teal);border-color:var(--teal);color:#06201c}
-.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.theme-toggle{width:106px;height:44px;padding:5px 9px;display:flex;align-items:center;justify-content:space-between;gap:7px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--muted);cursor:pointer}
+.brand{text-decoration:none;color:var(--text);font:700 21px/1 Inter,sans-serif;letter-spacing:-.04em}.brand em{font-family:Fraunces,Georgia,serif;font-style:normal;font-weight:600}
+.header-actions{display:flex;align-items:center;gap:10px}
+.back-link,.btn{min-height:44px;padding:11px 16px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--text);font:600 13px Inter,sans-serif;text-decoration:none;cursor:pointer;transition:.18s}
+.back-link:hover,.btn:hover{border-color:var(--teal);transform:translateY(-1px)}
+.theme-toggle{width:106px;height:44px;padding:5px 9px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--muted);cursor:pointer}
 .theme-track{position:relative;width:42px;height:24px;border-radius:99px;background:color-mix(in srgb,var(--muted) 22%,transparent);border:1px solid var(--line)}
 .theme-thumb{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--teal);transition:.25s}
 html[data-theme="light"] .theme-thumb{transform:translateX(18px);background:var(--amber)}
 .sun{color:var(--amber)}.moon{color:var(--teal)}
-.hero{padding:56px 0 30px}.eyebrow,.mini{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.14em;color:var(--teal)}
+.hero{padding:54px 0 28px}.eyebrow,.mini{color:var(--teal);font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase}
 h1,h2,h3{font-family:Fraunces,Georgia,serif;letter-spacing:-.035em;color:var(--heading)}
-h1{font-size:clamp(44px,6vw,72px);line-height:1;margin:14px 0}
-h1 em{color:var(--teal)}h2{font-size:clamp(31px,4vw,45px);margin:7px 0}h3{font-size:23px}
-.hero p,.section-head p{max-width:820px;color:var(--muted);line-height:1.72;font-size:16px}
+h1{font-size:clamp(44px,6vw,72px);line-height:1;margin:14px 0}h1 em{color:var(--teal)}
+h2{font-size:clamp(30px,4vw,44px);line-height:1.05;margin:7px 0}h3{font-size:24px;line-height:1.08;margin:6px 0}
+.hero p,.section-copy{max-width:840px;color:var(--muted);font-size:15px;line-height:1.75}
 .panel{background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 45px rgba(0,0,0,.08)}
-.section{padding:25px;margin-top:18px}
-.section-head{margin-bottom:20px}
-
-.import-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
-.import-card{padding:23px}
-.dropzone{
-  min-height:145px;border:1px dashed color-mix(in srgb,var(--teal) 38%,var(--line));border-radius:15px;
-  display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;
-  background:color-mix(in srgb,var(--teal) 4%,transparent);cursor:pointer;transition:.2s
-}
-.dropzone:hover{background:color-mix(in srgb,var(--teal) 7%,transparent);border-color:var(--teal)}
-.dropzone input{display:none}
-.drop-title{font-weight:700}.drop-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
-.status{margin-top:13px;color:var(--muted);font-size:12px;line-height:1.5}
-.status.good{color:var(--teal)}.status.error{color:var(--red)}
-
+.section{padding:24px;margin-top:18px}
+.import-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:15px}
+.import-card{padding:22px}
+.dropzone{min-height:154px;border:1px dashed color-mix(in srgb,var(--teal) 38%,var(--line));border-radius:15px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;background:color-mix(in srgb,var(--teal) 4%,transparent);cursor:pointer}
+.dropzone:hover{background:color-mix(in srgb,var(--teal) 8%,transparent);border-color:var(--teal)}
+.dropzone input{display:none}.drop-title{font-weight:700}.drop-note{margin-top:7px;color:var(--muted);font-size:12px;line-height:1.5}
+.status{margin-top:13px;font-size:12px;line-height:1.5;color:var(--muted)}.status.good{color:var(--teal)}.status.error{color:var(--red)}
+.meta-list{margin:11px 0 0;padding-left:17px;color:var(--muted);font-size:12px;line-height:1.65}
 .filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
-select,input[type="date"]{min-height:47px;width:100%;padding:12px 13px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);color:var(--text);outline:none}
-select:focus,input[type="date"]:focus{border-color:var(--teal)}
-
+select,input[type="date"]{width:100%;min-height:47px;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
 .kpi{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--panel2)}
-.kpi .label{font:500 9px "IBM Plex Mono";color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-.kpi .value{font:500 30px "IBM Plex Mono";color:var(--teal);margin-top:10px}
-.kpi .sub{font-size:11px;color:var(--muted);margin-top:6px}
-
-.profile{margin-top:18px;padding:23px}
-.bars{display:grid;gap:10px;margin-top:18px}
-.bar-row{display:grid;grid-template-columns:minmax(220px,1.25fr) 2fr 60px;gap:12px;align-items:center}
-.bar-name{font-size:11px;color:var(--muted);line-height:1.35}
-.bar-track{height:9px;border-radius:999px;background:var(--line);overflow:hidden}.bar-fill{height:100%;background:var(--teal);border-radius:inherit}
-.bar-value{text-align:right;font:500 11px "IBM Plex Mono"}
-
-.insights{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
-.insight{padding:23px}.insight.green{border-color:color-mix(in srgb,var(--teal) 32%,var(--line));background:color-mix(in srgb,var(--teal) 5%,var(--panel))}
-.insight.amber{border-color:color-mix(in srgb,var(--amber) 34%,var(--line));background:color-mix(in srgb,var(--amber) 5%,var(--panel))}
-.insight .big{font:500 34px "IBM Plex Mono";color:var(--teal);margin-top:10px}.insight p{color:var(--muted);line-height:1.65;font-size:13px}
-
-.comments{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
-.comment-card{padding:23px}.comment-title{font:500 9px "IBM Plex Mono";letter-spacing:.1em;color:var(--teal)}
-.comment-text{margin-top:12px;padding:14px;border-radius:11px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.65;min-height:88px}
-.comment-list{margin:12px 0 0;padding-left:17px;color:var(--muted);font-size:12px;line-height:1.65}
-
-.actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px}
+.kpi-label{font:500 9px "IBM Plex Mono";letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.kpi-value{font:500 29px/1.05 "IBM Plex Mono";color:var(--teal);margin-top:10px;word-break:break-word}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:6px}
+.chart{padding:23px;margin-top:18px}
+.chart-head{display:flex;justify-content:space-between;gap:14px;align-items:end}
 .note{color:var(--muted);font-size:12px;line-height:1.6}
+.bars{display:grid;gap:10px;margin-top:17px}
+.bar-row{display:grid;grid-template-columns:minmax(230px,1.2fr) 2fr 56px;gap:10px;align-items:center}
+.bar-name{font-size:11px;line-height:1.33;color:var(--muted)}
+.bar-track{height:9px;background:var(--line);border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:inherit}
+.bar-value{text-align:right;font:500 10px "IBM Plex Mono";color:var(--text)}
+.insights{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}
+.insight{padding:23px}.insight.green{background:color-mix(in srgb,var(--teal) 5%,var(--panel));border-color:color-mix(in srgb,var(--teal) 30%,var(--line))}
+.insight.amber{background:color-mix(in srgb,var(--amber) 5%,var(--panel));border-color:color-mix(in srgb,var(--amber) 30%,var(--line))}
+.big{font:500 34px "IBM Plex Mono";color:var(--teal);margin-top:9px}.insight p{color:var(--muted);font-size:12px;line-height:1.65}
+.comments{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}.comment-card{padding:23px}
+.comment-text{margin-top:11px;padding:13px;border:1px solid var(--line);background:var(--panel2);border-radius:11px;color:var(--muted);font-size:12px;line-height:1.65;min-height:95px}
+.action-card{padding:23px;margin-top:18px}.action-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}
+.hidden{display:none!important}footer{padding:28px 0 0;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}
 
-#pdfReport{display:none;visibility:hidden;opacity:0;position:relative;width:794px;height:1123px;overflow:hidden;background:#f8fbfa}
-
-body.pdf-exporting{background:#fff !important;overflow:hidden !important}
-body.pdf-exporting > .page,body.pdf-exporting > .grid{display:none !important}
-
-
-@media(max-width:800px){
-  .page{padding:0 16px 60px}
-  header{min-height:78px}
-  .head-actions{gap:7px}.theme-toggle{width:98px}
-  .import-grid,.insights,.comments{grid-template-columns:1fr}
-  .filters{grid-template-columns:1fr}
-  .summary{grid-template-columns:1fr 1fr}
-  .bar-row{grid-template-columns:1fr 2fr 50px}
+#pdfReport{display:none;position:absolute;left:0;top:0;width:794px;height:1123px;background:#f8fbfa;overflow:hidden}
+.pdf-page{
+  width:794px;height:1123px;padding:34px 36px 28px;overflow:hidden;
+  display:flex;flex-direction:column;
+  background:linear-gradient(135deg,#edf8f5 0%,#f8fbfa 48%,#fff6e8 100%);
+  color:#182725;font-family:Arial,Helvetica,sans-serif
 }
-@media(max-width:480px){
-  .brand{font-size:18px}.brand span{display:none}
-  .head-actions .back{display:none}
-  .summary{grid-template-columns:1fr}
+.pdf-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #178f7f;padding-bottom:14px}
+.pdf-brand-kicker{font:bold 9px Arial;color:#178f7f;letter-spacing:1.5px}.pdf-title{font:bold 24px Arial;color:#182725;margin-top:4px}.pdf-date{font:10px/1.5 Arial;color:#667774;text-align:right}
+.pdf-meta{display:grid;grid-template-columns:1.15fr 1.15fr 1fr 1fr;gap:9px;margin-top:12px}.pdf-meta-box{background:#fff;border:1px solid #dce6e3;border-radius:10px;padding:9px 10px}.pdf-meta-label{font:bold 7px Arial;color:#178f7f;letter-spacing:1px;text-transform:uppercase}.pdf-meta-value{font:bold 10px Arial;color:#21322f;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdf-hero{display:grid;grid-template-columns:190px 1fr;gap:18px;margin-top:13px}.pdf-score{background:#173a35;border-radius:14px;padding:16px;color:#fff;min-height:148px}.pdf-score-label{font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px}.pdf-score-num{font:bold 45px Arial;margin-top:8px}.pdf-score-sub{font:9px Arial;color:#d1e6e1;margin-top:2px}.pdf-pill{display:inline-block;margin-top:11px;padding:5px 9px;border-radius:999px;color:#06201c;font:bold 8px Arial}
+.pdf-exec{background:#fff;border:1px solid #dce6e3;border-radius:14px;padding:15px}.pdf-exec-label{font:bold 8px Arial;color:#178f7f;letter-spacing:1px}.pdf-exec-title{font:bold 18px Arial;color:#1d2e2b;margin-top:5px}.pdf-exec-text{font:9.5px/1.55 Arial;color:#5e6f6b;margin-top:7px}.pdf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.pdf-stat{background:#f2f8f6;border-radius:9px;padding:8px}.pdf-stat b{font:bold 15px Arial;color:#178f7f}.pdf-stat div{font:7px Arial;color:#70817d;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.pdf-section-title{display:flex;justify-content:space-between;align-items:end;margin-top:14px;padding-bottom:7px;border-bottom:1px solid #dce6e3}.pdf-section-title strong{font:bold 12px Arial;color:#1c2d2a}.pdf-section-title span{font:8px Arial;color:#71817e}
+.pdf-question-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;margin-top:10px}.pdf-q{display:grid;grid-template-columns:115px 1fr 35px;gap:7px;align-items:center}.pdf-q-name{font:bold 7.4px/1.25 Arial;color:#354642}.pdf-q-track{height:7px;background:#e2eae7;border-radius:999px;overflow:hidden}.pdf-q-fill{height:100%;border-radius:inherit}.pdf-q-value{text-align:right;font:bold 8px Arial;color:#1c2d2a}
+.pdf-insights{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:12px}.pdf-insight{border:1px solid #dce6e3;border-radius:11px;padding:11px;background:#fff}.pdf-insight.g{background:#effaf6}.pdf-insight.a{background:#fff7eb}.pdf-insight.b{background:#f0f6fe}.pdf-insight-label{font:bold 7px Arial;letter-spacing:.9px;text-transform:uppercase}.pdf-insight.g .pdf-insight-label{color:#178f7f}.pdf-insight.a .pdf-insight-label{color:#c98518}.pdf-insight.b .pdf-insight-label{color:#4778ba}.pdf-insight-title{font:bold 10px/1.3 Arial;color:#243532;margin-top:5px}.pdf-insight-score{font:bold 16px Arial;margin-top:3px}.pdf-insight.g .pdf-insight-score{color:#178f7f}.pdf-insight.a .pdf-insight-score{color:#c98518}.pdf-insight.b .pdf-insight-score{color:#4778ba}
+.pdf-bottom{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px}.pdf-box{border:1px solid #dce6e3;border-radius:11px;background:#fff;padding:12px;min-height:95px}.pdf-box-title{font:bold 8px Arial;color:#178f7f;letter-spacing:1px;text-transform:uppercase}.pdf-list{margin:7px 0 0 15px;padding:0;font:8.2px/1.5 Arial;color:#566662}.pdf-list li{margin-bottom:2px}
+.pdf-action{margin-top:11px;background:#173a35;border-radius:11px;padding:12px;color:#fff}.pdf-action-label{font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px;text-transform:uppercase}.pdf-action-title{font:bold 12px Arial;margin-top:4px}.pdf-action-text{font:8.3px/1.5 Arial;color:#d6e9e4;margin-top:4px}.pdf-footer{margin-top:auto;border-top:1px solid #dce6e3;padding-top:8px;display:flex;justify-content:space-between;font:7px Arial;color:#7a8986}
+
+@media(max-width:850px){
+  .import-grid,.insights,.comments{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .app-shell{padding:0 16px 60px}.header-actions .back-link{display:none}.brand{font-size:18px}
+  .summary{grid-template-columns:1fr}.bar-row{grid-template-columns:1fr 2fr 48px}
+  .chart{padding:20px}.section{padding:20px}
 }
 </style>
 </head>
-
 <body>
 <div class="grid"></div>
 
-<div class="page">
+<div class="app-shell">
 <header>
-  <a class="brand" href="index.html">GG <span>LearnLabs</span></a>
-  <div class="head-actions">
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch theme">
-      <span class="sun">☀</span>
-      <span class="theme-track"><span class="theme-thumb"></span></span>
-      <span class="moon">☾</span>
+  <a class="brand" href="index.html">GG <em>LearnLabs</em></a>
+  <div class="header-actions">
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Toggle light / dark mode">
+      <span class="sun">☀</span><span class="theme-track"><span class="theme-thumb"></span></span><span class="moon">☾</span>
     </button>
-    <a class="btn back" href="index.html">← Back to Tools</a>
+    <a class="back-link" href="index.html">← Back to Tools</a>
   </div>
 </header>
 
 <section class="hero">
-  <div class="eyebrow">LEVEL 1 TRAINING FEEDBACK</div>
-  <h1>Hear the learner.<br><em>Improve the experience.</em></h1>
+  <div class="eyebrow">LEVEL 1 FEEDBACK ANALYZER</div>
+  <h1>Hear the learner.<br><em>See the signal.</em></h1>
   <p>
-    Analyze the actual L1 feedback survey used by the L&amp;D team.
-    Upload your Microsoft Forms Excel export, filter the responses, identify
-    strengths and gaps, and generate a management-ready insight report.
+    Upload <strong>any</strong> learner feedback spreadsheet. GG LearnLabs automatically
+    detects rating questions, response columns, learner comments and useful metadata —
+    so the analyzer is not tied to one questionnaire or a fixed number of questions.
   </p>
 </section>
 
@@ -150,69 +138,56 @@ body.pdf-exporting > .page,body.pdf-exporting > .grid{display:none !important}
   <div class="section-head">
     <div class="mini">01 — DATA INPUT</div>
     <h2>Bring in your feedback.</h2>
-    <p>The tool accepts the Excel export from your L1 Training Feedback Survey. A demo dataset is pre-loaded for testing.</p>
+    <p class="section-copy">Excel and CSV files are processed entirely in your browser. No predefined number of questions is required.</p>
   </div>
 
   <div class="import-grid">
-    <div class="import-card panel">
-      <div class="dropzone" id="dropzone">
-        <label for="fileInput" style="cursor:pointer;width:100%;">
-          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv">
-          <div class="drop-title">Upload L1 response file</div>
-          <div class="drop-note">Excel (.xlsx/.xls) or CSV · one response per row</div>
-        </label>
-      </div>
-      <div class="status good" id="dataStatus">Demo data loaded · 1,362 response records available in the source file structure.</div>
+    <div class="panel import-card">
+      <label class="dropzone" for="fileInput">
+        <input id="fileInput" type="file" accept=".xlsx,.xls,.csv">
+        <div>
+          <div class="drop-title">Upload learner feedback file</div>
+          <div class="drop-note">.xlsx · .xls · .csv<br>One response per row. Rating columns can vary in number.</div>
+        </div>
+      </label>
+      <div id="dataStatus" class="status good">Demo data loaded · ready to test.</div>
     </div>
 
-    <div class="import-card panel">
-      <div class="mini">ANALYSIS LOGIC</div>
-      <ul class="comment-list">
-        <li>22 learner-rating questions are analysed on the original 1–5 scale.</li>
-        <li>Overall average is converted to a percentage of the 5-point maximum.</li>
-        <li>Open-ended “most valuable” and “could be improved” comments are surfaced.</li>
-        <li>Trainer and response filters update the analysis without sending data to a server.</li>
+    <div class="panel import-card">
+      <div class="mini">AUTOMATIC DETECTION</div>
+      <ul class="meta-list">
+        <li>Detects numeric Likert-style rating questions automatically.</li>
+        <li>Finds trainer, batch/cohort and response-date fields when present.</li>
+        <li>Finds qualitative feedback/comment fields without hard-coded question names.</li>
+        <li>Works with different numbers of questions and response rows.</li>
+        <li>Supports common 1–5 and 1–10 rating scales and infers the displayed percentage.</li>
       </ul>
-      <div class="actions">
-        <button class="btn" id="resetDemo" type="button">Reset to Demo</button>
-      </div>
+      <button id="resetDemo" class="btn" type="button">Reset to Demo</button>
     </div>
   </div>
 
-  <div class="filters">
+  <div id="filters" class="filters hidden">
     <select id="trainerFilter"><option value="ALL">All Trainers</option></select>
     <select id="batchFilter"><option value="ALL">All Batches</option></select>
-    <input id="dateFilter" type="date">
+    <select id="dateFilter"><option value="ALL">All Dates</option></select>
   </div>
 </section>
 
 <section class="summary">
-  <div class="kpi">
-    <div class="label">Responses</div>
-    <div class="value" id="kpiResponses">0</div>
-    <div class="sub">Current filter</div>
-  </div>
-  <div class="kpi">
-    <div class="label">Overall Average</div>
-    <div class="value" id="kpiAverage">0.00 / 5</div>
-    <div class="sub" id="kpiAveragePct">0.0%</div>
-  </div>
-  <div class="kpi">
-    <div class="label">Top Area</div>
-    <div class="value" id="kpiTop">—</div>
-    <div class="sub" id="kpiTopScore"></div>
-  </div>
-  <div class="kpi">
-    <div class="label">Focus Area</div>
-    <div class="value" id="kpiFocus">—</div>
-    <div class="sub" id="kpiFocusScore"></div>
-  </div>
+  <div class="kpi"><div class="kpi-label">Responses</div><div class="kpi-value" id="kpiResponses">0</div><div class="kpi-sub">Current selection</div></div>
+  <div class="kpi"><div class="kpi-label">Overall Average</div><div class="kpi-value" id="kpiAverage">0.00 / 5</div><div class="kpi-sub" id="kpiAveragePct">0.0%</div></div>
+  <div class="kpi"><div class="kpi-label">Rating Questions</div><div class="kpi-value" id="kpiQuestions">0</div><div class="kpi-sub">Automatically detected</div></div>
+  <div class="kpi"><div class="kpi-label">Response Coverage</div><div class="kpi-value" id="kpiCoverage">0%</div><div class="kpi-sub">Usable rating responses</div></div>
 </section>
 
-<section class="panel profile section">
-  <div class="mini">02 — QUESTION-WISE PERFORMANCE</div>
-  <h2>What are learners saying?</h2>
-  <p class="note">The chart uses the exact survey questions from your Microsoft Forms export.</p>
+<section class="panel chart">
+  <div class="chart-head">
+    <div>
+      <div class="mini">02 — QUESTION PERFORMANCE</div>
+      <h2>What are learners saying?</h2>
+    </div>
+    <div class="note" id="chartNote">All detected rating questions</div>
+  </div>
   <div class="bars" id="questionBars"></div>
 </section>
 
@@ -223,7 +198,6 @@ body.pdf-exporting > .page,body.pdf-exporting > .grid{display:none !important}
     <div class="big" id="strongestBig">—</div>
     <p id="strongestText"></p>
   </article>
-
   <article class="panel insight amber">
     <div class="mini">⚠️ BIGGEST OPPORTUNITY</div>
     <h3 id="focusTitle">—</h3>
@@ -234,322 +208,57 @@ body.pdf-exporting > .page,body.pdf-exporting > .grid{display:none !important}
 
 <section class="comments">
   <article class="panel comment-card">
-    <div class="comment-title">WHAT LEARNERS FOUND MOST VALUABLE</div>
-    <div id="valuableThemes" class="comment-text"></div>
+    <div class="mini">WHAT LEARNERS FOUND VALUABLE</div>
+    <div id="valuableComments" class="comment-text"></div>
   </article>
-
   <article class="panel comment-card">
-    <div class="comment-title">WHAT LEARNERS WANT IMPROVED</div>
-    <div id="improvementThemes" class="comment-text"></div>
+    <div class="mini">WHAT LEARNERS WANT IMPROVED</div>
+    <div id="improvementComments" class="comment-text"></div>
   </article>
 </section>
 
-<section class="panel section">
+<section class="panel action-card">
   <div class="mini">03 — L&amp;D INSIGHT</div>
   <h2 id="insightHeading">Feedback is ready.</h2>
-  <p class="note" id="insightText">Upload or use the demo dataset to generate an interpretation.</p>
-
-  <div class="actions">
-    <div class="note">All processing stays in the browser.</div>
-    <button class="btn btn-primary" id="exportButton" type="button">Export 1-page L1 Report ↓</button>
+  <p class="section-copy" id="insightText">Use the demo or upload a feedback file to generate the learner signal.</p>
+  <div class="action-row">
+    <div class="note">All analysis stays in the browser.</div>
+    <button id="exportButton" class="btn" type="button">Export 1-page L1 Report ↓</button>
   </div>
 </section>
 
-<footer style="padding-top:28px;color:var(--muted);font:10px 'IBM Plex Mono';letter-spacing:.08em">
-  GG LearnLabs · Level 1 Training Feedback Analyzer · Client-side L&amp;D analytics
-</footer>
+<footer>GG LearnLabs · Universal Level 1 Feedback Analyzer · Client-side L&amp;D analytics</footer>
 </div>
 
 <div id="pdfReport"></div>
 
 <script>
-const ratingColumns = [
-  "The training topics were explained in a clear and simple way.",
-  "The training material (slides, handouts, examples) was easy to use and helpful.",
-  "The training covered all the important subjects needed for my job.",
-  "The examples and practice exercises were relevant to the actual work.",
-  "The trainer explained the topics in a way that was easy to understand.",
-  "The trainer answered questions clearly and with patience.",
-  "The trainer kept the session interesting and engaging.",
-  "The trainer encouraged participation and created a comfortable environment.",
-  "The trainer was knowledgeable and confident in the subject.",
-  "I feel more confident in using what I learned during the training.",
-  "The training has improved my knowledge and skills.",
-  "The speed and pace of the training were comfortable for me.",
-  "The practice activities helped me understand the topics better.",
-  "I am better prepared to handle the actual work after this training.",
-  "The training room/online platform was comfortable and suitable for learning.",
-  "The systems, tools, and facilities (internet, mic, projector, etc.) worked properly.",
-  "The training schedule (timings, duration, and breaks) was well planned.",
-  "The overall environment supported effective learning.",
-  "The training met my learning needs and expectations.",
-  "I would recommend this training to others.",
-  "Overall, I am satisfied with the quality of this training.",
-  "The training will help me perform better in my role."
-];
-
-const metaColumns = {
-  trainer:"Please select your trainer:",
-  batch:"Your batch name/ID: (Please ask your trainer if you are unaware of it)",
-  date:"Completion time",
-  valuable:"Please share what you found most valuable about the training",
-  improvement:"Please share what aspects of the training could be improved"
+const state = {
+  rows: [],
+  ratingColumns: [],
+  ratingMeta: new Map(),
+  commentColumns: [],
+  trainerColumn: null,
+  batchColumn: null,
+  dateColumn: null,
+  workbookName: "Demo",
+  sheetName: "Demo"
 };
-
-let rows = [];
-let demoRows = [];
 
 const $ = id => document.getElementById(id);
 
 function normalize(value){
-  return String(value ?? "")
-    .replace(/\s+/g," ")
-    .trim();
+  return String(value ?? "").replace(/\u00A0/g," ").replace(/\s+/g," ").trim();
 }
 
-function toNumber(value){
-  const n = Number(String(value ?? "").replace(/[^\d.]/g,""));
-  return Number.isFinite(n) && n >= 1 && n <= 5 ? n : null;
-}
-
-function excelSerialToDate(serial){
-  if(typeof serial !== "number") return new Date(serial);
-  const utcDays = Math.floor(serial - 25569);
-  const utcValue = utcDays * 86400 * 1000;
-  return new Date(utcValue);
-}
-
-function parseDateValue(value){
-  if(value instanceof Date && !isNaN(value)) return value;
-  if(typeof value === "number") return excelSerialToDate(value);
-  const d = new Date(value);
-  return isNaN(d) ? null : d;
-}
-
-function dateKey(value){
-  const d = parseDateValue(value);
-  if(!d) return "";
-  return [
-    d.getFullYear(),
-    String(d.getMonth()+1).padStart(2,"0"),
-    String(d.getDate()).padStart(2,"0")
-  ].join("-");
-}
-
-function formatShortDate(value){
-  const d = parseDateValue(value);
-  if(!d) return "—";
-  return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-}
-
-function cleanQuestion(q){
-  return normalize(q.replace(/\s+/g," "));
-}
-
-function scoreQuestion(data, column){
-  const values = data.map(row => toNumber(row[column])).filter(v => v !== null);
-  if(!values.length) return null;
-  const avg = values.reduce((a,b)=>a+b,0)/values.length;
-  return {avg, pct:avg/5*100, n:values.length};
-}
-
-function aggregate(data){
-  const questions = ratingColumns.map(column => ({
-    column,
-    ...scoreQuestion(data,column)
-  })).filter(x => x.avg !== null);
-
-  const allValues = [];
-  data.forEach(row => ratingColumns.forEach(column => {
-    const n = toNumber(row[column]);
-    if(n !== null) allValues.push(n);
-  }));
-
-  const overallAverage = allValues.length
-    ? allValues.reduce((a,b)=>a+b,0)/allValues.length
-    : 0;
-
-  const top = [...questions].sort((a,b)=>b.avg-a.avg)[0] || null;
-  const focus = [...questions].sort((a,b)=>a.avg-b.avg)[0] || null;
-
-  const valuable = data
-    .map(row => normalize(row[metaColumns.valuable]))
-    .filter(Boolean);
-
-  const improvements = data
-    .map(row => normalize(row[metaColumns.improvement]))
-    .filter(Boolean);
-
-  return {
-    responses:data.length,
-    questions,
-    overallAverage,
-    overallPct:overallAverage/5*100,
-    top,
-    focus,
-    valuable,
-    improvements
-  };
-}
-
-function filterRows(){
-  const trainer = $("trainerFilter").value;
-  const batch = $("batchFilter").value;
-  const selectedDate = $("dateFilter").value;
-
-  return rows.filter(row => {
-    const trainerOk =
-      trainer === "ALL" ||
-      normalize(row[metaColumns.trainer]) === trainer;
-
-    const batchOk =
-      batch === "ALL" ||
-      normalize(row[metaColumns.batch]) === batch;
-
-    const dateOk =
-      !selectedDate ||
-      dateKey(row[metaColumns.date]) === selectedDate;
-
-    return trainerOk && batchOk && dateOk;
-  });
-}
-
-function populateFilters(data){
-  const trainers = [...new Set(
-    data.map(row => normalize(row[metaColumns.trainer])).filter(Boolean)
-  )].sort();
-
-  const batches = [...new Set(
-    data.map(row => normalize(row[metaColumns.batch])).filter(Boolean)
-  )].sort();
-
-  $("trainerFilter").innerHTML =
-    `<option value="ALL">All Trainers</option>` +
-    trainers.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-
-  $("batchFilter").innerHTML =
-    `<option value="ALL">All Batches</option>` +
-    batches.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-}
-
-function render(){
-  const data = filterRows();
-  const a = aggregate(data);
-
-  $("kpiResponses").textContent = a.responses;
-  $("kpiAverage").textContent = `${a.overallAverage.toFixed(2)} / 5`;
-  $("kpiAveragePct").textContent = `${a.overallPct.toFixed(1)}%`;
-
-  $("kpiTop").textContent = a.top ? shortLabel(a.top.column) : "—";
-  $("kpiTopScore").textContent = a.top ? `${a.top.avg.toFixed(2)} / 5` : "";
-  $("kpiFocus").textContent = a.focus ? shortLabel(a.focus.column) : "—";
-  $("kpiFocusScore").textContent = a.focus ? `${a.focus.avg.toFixed(2)} / 5` : "";
-
-  $("questionBars").innerHTML = a.questions.map(q => {
-    const width = Math.max(0,Math.min(100,q.pct));
-    const fill = q.pct >= 90 ? "#168c7b" : q.pct >= 80 ? "#c98518" : "#c85656";
-
-    return `
-      <div class="bar-row">
-        <div class="bar-name">${esc(shortLabel(q.column))}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${fill}"></div></div>
-        <div class="bar-value">${q.avg.toFixed(2)}</div>
-      </div>
-    `;
-  }).join("");
-
-  if(a.top){
-    $("strongestTitle").textContent = shortLabel(a.top.column);
-    $("strongestBig").textContent = `${a.top.avg.toFixed(2)} / 5`;
-    $("strongestText").textContent = `This is the strongest-rated learner experience in the current selection, with ${a.top.n} usable responses.`;
-  } else {
-    $("strongestTitle").textContent = "—";
-    $("strongestBig").textContent = "—";
-    $("strongestText").textContent = "No rating data available.";
-  }
-
-  if(a.focus){
-    $("focusTitle").textContent = shortLabel(a.focus.column);
-    $("focusBig").textContent = `${a.focus.avg.toFixed(2)} / 5`;
-    $("focusText").textContent = `This is the lowest-rated question in the current selection and should be investigated for the clearest improvement opportunity.`;
-  } else {
-    $("focusTitle").textContent = "—";
-    $("focusBig").textContent = "—";
-    $("focusText").textContent = "No rating data available.";
-  }
-
-  $("valuableThemes").textContent = summarizeComments(
-    a.valuable,
-    "Learners highlighted practical content, trainer support and relevant examples."
-  );
-
-  $("improvementThemes").textContent = summarizeComments(
-    a.improvements,
-    "No consistent improvement theme was identified from the available comments."
-  );
-
-  const ratingText =
-    a.overallPct >= 90
-      ? "Learner sentiment is exceptionally positive."
-      : a.overallPct >= 80
-      ? "Learner sentiment is strong overall, with targeted opportunities to improve."
-      : a.overallPct >= 70
-      ? "Learner sentiment is acceptable but indicates meaningful opportunities for improvement."
-      : "Learner sentiment indicates that the program should be reviewed closely.";
-
-  $("insightHeading").textContent = ratingText;
-
-  $("insightText").textContent =
-    a.focus
-      ? `The overall learner rating is ${a.overallAverage.toFixed(2)} / 5 (${a.overallPct.toFixed(1)}%). The strongest signal is "${shortLabel(a.top.column)}"; the clearest opportunity is "${shortLabel(a.focus.column)}".`
-      : "Upload a response file or use the demo dataset to generate the insight.";
-
-  window.currentAnalysis = a;
-}
-
-function shortLabel(q){
-  const replacements = [
-    ["The training topics were explained in a clear and simple way.","Clear & simple explanation"],
-    ["The training material (slides, handouts, examples) was easy to use and helpful.","Training materials"],
-    ["The training covered all the important subjects needed for my job.","Content coverage"],
-    ["The examples and practice exercises were relevant to the actual work.","Work relevance"],
-    ["The trainer explained the topics in a way that was easy to understand.","Trainer clarity"],
-    ["The trainer answered questions clearly and with patience.","Questions & patience"],
-    ["The trainer kept the session interesting and engaging.","Engagement"],
-    ["The trainer encouraged participation and created a comfortable environment.","Participation"],
-    ["The trainer was knowledgeable and confident in the subject.","Trainer knowledge"],
-    ["I feel more confident in using what I learned during the training.","Confidence to use"],
-    ["The training has improved my knowledge and skills.","Knowledge & skills"],
-    ["The speed and pace of the training were comfortable for me.","Pace"],
-    ["The practice activities helped me understand the topics better.","Practice activities"],
-    ["I am better prepared to handle the actual work after this training.","Job readiness"],
-    ["The training room/online platform was comfortable and suitable for learning.","Learning environment"],
-    ["The systems, tools, and facilities (internet, mic, projector, etc.) worked properly.","Systems & facilities"],
-    ["The training schedule (timings, duration, and breaks) was well planned.","Schedule"],
-    ["The overall environment supported effective learning.","Overall environment"],
-    ["The training met my learning needs and expectations.","Needs & expectations"],
-    ["I would recommend this training to others.","Recommendation"],
-    ["Overall, I am satisfied with the quality of this training.","Overall satisfaction"],
-    ["The training will help me perform better in my role.","Role performance"]
-  ];
-  const found = replacements.find(([full])=>full===q);
-  return found ? found[1] : q;
-}
-
-function summarizeComments(comments,fallback){
-  if(!comments.length) return fallback;
-
-  const usable = comments
-    .filter(x => x.length >= 4)
-    .slice(0,6);
-
-  if(!usable.length) return fallback;
-
-  return usable.map((x,i)=>`${i+1}. ${x}`).join(" ");
+function normalizeHeader(value){
+  return normalize(value)
+    .replace(/[\u200B-\u200D\uFEFF]/g,"")
+    .toLowerCase();
 }
 
 function esc(value){
-  return String(value||"")
+  return String(value ?? "")
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
@@ -557,281 +266,857 @@ function esc(value){
     .replace(/'/g,"&#039;");
 }
 
-function makeDemoData(){
-  const trainerNames = ["Yash Shah","Aniket Mahesh Bhargava","Shreya Bhatt","Dwij Jitendra Nandwani","Vandana Sanjay Wadhva","Vimalkumar Savjibhai Bujad"];
-  const demo = [];
-
-  for(let i=0;i<30;i++){
-    const row = {};
-    row[metaColumns.trainer] = trainerNames[i % trainerNames.length];
-    row[metaColumns.batch] = `Demo Batch ${46 + (i%3)}`;
-    row[metaColumns.date] = new Date(2026,4,(i%20)+1);
-
-    ratingColumns.forEach((q,idx)=>{
-      let base = 4;
-
-      if(idx===5 || idx===8 || idx===20) base = 4.45;
-      if(idx===3 || idx===11 || idx===15) base = 3.85;
-
-      const variation = ((i*idx)%7 - 3) * 0.12;
-      const value = Math.max(2,Math.min(5,Math.round((base+variation)*10)/10));
-
-      row[q] = String(Math.max(1,Math.min(5,Math.round(value))));
-    });
-
-    const valuable = [
-      "Practical examples and the trainer's explanations were very useful.",
-      "The trainer was knowledgeable and supportive.",
-      "The practice activities made the content easier to understand.",
-      "Learning how the process works in real situations was valuable."
-    ];
-
-    const improvements = [
-      "More time for practice would help.",
-      "The pace could be slightly slower.",
-      "More role-specific examples would be useful.",
-      "Nothing major; the training was clear."
-    ];
-
-    row[metaColumns.valuable] = valuable[i%valuable.length];
-    row[metaColumns.improvement] = improvements[i%improvements.length];
-
-    demo.push(row);
-  }
-
-  return demo;
+function safeFileName(value){
+  return String(value || "report")
+    .replace(/[^a-z0-9]+/gi,"-")
+    .replace(/^-+|-+$/g,"")
+    .toLowerCase() || "report";
 }
 
-async function parseWorkbook(file){
-  if(!window.XLSX) throw new Error("Spreadsheet parser is not available. Please refresh the page.");
+function parseNumeric(value){
+  if(value === null || value === undefined || value === "") return null;
+  if(typeof value === "number" && Number.isFinite(value)) return value;
 
-  const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer,{type:"array",cellDates:true});
+  const text = normalize(value);
+  if(!text) return null;
 
-  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-  const raw = XLSX.utils.sheet_to_json(firstSheet,{defval:""});
+  // Accept "4", "4.5", "4 - Strongly Agree", "5/5", etc.
+  const match = text.match(/(?:^|\s)(10|[0-9](?:\.[0-9]+)?)(?:\s*\/\s*(?:5|10))?(?:\s|$|-|–|—)/);
+  if(match) return Number(match[1]);
 
-  if(!raw.length) throw new Error("The uploaded file does not contain response rows.");
+  const direct = Number(text);
+  return Number.isFinite(direct) ? direct : null;
+}
 
-  const first = raw[0];
+function headerLooksLikeMeta(header){
+  const h = normalizeHeader(header);
 
-  const matchedQuestions = ratingColumns.filter(q =>
-    Object.prototype.hasOwnProperty.call(first,q)
+  const metaWords = [
+    "email","e-mail","mail","phone","mobile","id","identifier",
+    "timestamp","completion time","start time","end time",
+    "submitted","response id","record id","name of respondent",
+    "respondent name","employee id","employee code",
+    "trainer","facilitator","instructor","faculty",
+    "batch","cohort","class","group","team",
+    "department","business unit","location","region",
+    "date","time"
+  ];
+
+  return metaWords.some(word => h === word || h.startsWith(word + " ") || h.includes(word));
+}
+
+function looksLikeLikertHeader(header){
+  const h = normalizeHeader(header);
+  return /rate|rating|score|satisfied|satisfaction|agree|disagree|strongly|likely|recommend|overall|quality|trainer|training|session|learning|content|material|pace|environment|prepared|confidence|knowledge|skills|application|useful|valuable|improv/i.test(h);
+}
+
+function inferScale(values, header){
+  const h = normalizeHeader(header);
+  if(/\b(?:out of|of)\s*10\b|\b1\s*(?:-|to)\s*10\b|\bten\b/.test(h)) return {min:1,max:10};
+  if(/\b(?:out of|of)\s*5\b|\b1\s*(?:-|to)\s*5\b|\bfive\b/.test(h)) return {min:1,max:5};
+
+  const nums = values.filter(v=>typeof v === "number" && Number.isFinite(v));
+  if(!nums.length) return {min:1,max:5};
+
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+
+  // Strong inference for common Likert scales.
+  if(min >= 0 && max <= 5 && new Set(nums).size <= 6) return {min:1,max:5};
+  if(min >= 1 && max <= 10 && new Set(nums).size <= 10) return {min:1,max:10};
+
+  return {min:1,max:5};
+}
+
+function chooseBestSheet(workbook){
+  let best = null;
+  let bestScore = -Infinity;
+
+  workbook.SheetNames.forEach(name=>{
+    const sheet = workbook.Sheets[name];
+    const raw = XLSX.utils.sheet_to_json(sheet,{defval:"",raw:true});
+    if(!raw.length) return;
+
+    const headers = Object.keys(raw[0]);
+    const rowCount = raw.length;
+
+    let numericColumns = 0;
+    let likelyQuestions = 0;
+
+    headers.forEach(header=>{
+      const values = raw.slice(0,Math.min(raw.length,100))
+        .map(row=>parseNumeric(row[header]))
+        .filter(v=>v !== null);
+
+      const nonBlank = raw.slice(0,Math.min(raw.length,100))
+        .map(row=>normalize(row[header]))
+        .filter(Boolean).length;
+
+      if(nonBlank >= 5 && values.length / nonBlank >= 0.6){
+        const unique = new Set(values.map(v=>String(v))).size;
+        if(values.every(v=>v>=0 && v<=10) && unique >= 2 && unique <= 10){
+          numericColumns++;
+          if(!headerLooksLikeMeta(header) || looksLikeLikertHeader(header)) likelyQuestions++;
+        }
+      }
+    });
+
+    const score = Math.min(rowCount,5000) + numericColumns*35 + likelyQuestions*45 + Math.min(headers.length,60)*2;
+
+    if(score > bestScore){
+      bestScore = score;
+      best = {name,rows:raw,headers};
+    }
+  });
+
+  return best;
+}
+
+function detectStructure(rows){
+  const headers = Object.keys(rows[0] || {});
+  const scanRows = rows.slice(0,Math.min(rows.length,200));
+
+  const ratingColumns = [];
+  const ratingMeta = new Map();
+
+  headers.forEach(header=>{
+    const rawValues = scanRows
+      .map(row=>parseNumeric(row[header]))
+      .filter(v=>v !== null);
+
+    const nonBlank = scanRows
+      .map(row=>normalize(row[header]))
+      .filter(Boolean).length;
+
+    if(nonBlank < Math.max(3,Math.min(10,Math.ceil(scanRows.length*0.05)))) return;
+
+    const numericRate = rawValues.length / nonBlank;
+    const uniqueCount = new Set(rawValues.map(v=>String(v))).size;
+    const likelyScale = rawValues.length &&
+      rawValues.every(v=>v >= 0 && v <= 10) &&
+      uniqueCount >= 2 &&
+      uniqueCount <= 10;
+
+    const isMeta = headerLooksLikeMeta(header);
+
+    if(likelyScale && numericRate >= 0.55 && (!isMeta || looksLikeLikertHeader(header))){
+      const scale = inferScale(rawValues,header);
+      ratingColumns.push(header);
+      ratingMeta.set(header,scale);
+    }
+  });
+
+  const commentColumns = headers.filter(header=>{
+    const h = normalizeHeader(header);
+    if(ratingColumns.includes(header)) return false;
+
+    const keywords = [
+      "comment","feedback","remark","suggestion","improve","valuable",
+      "most valuable","least valuable","why","additional","what did",
+      "what could","please share","describe","reason","thoughts","opinion",
+      "strength","area for improvement","improvement"
+    ];
+
+    const hit = keywords.some(k=>h.includes(k));
+    if(!hit) return false;
+
+    const textCount = scanRows
+      .map(row=>normalize(row[header]))
+      .filter(v=>v && parseNumeric(v) === null).length;
+
+    return textCount >= 1;
+  });
+
+  const findColumn = patterns =>
+    headers.find(header=>{
+      const h = normalizeHeader(header);
+      return patterns.some(p=>h===p || h.includes(p));
+    }) || null;
+
+  state.ratingColumns = ratingColumns;
+  state.ratingMeta = ratingMeta;
+  state.commentColumns = commentColumns;
+  state.trainerColumn = findColumn(["trainer","facilitator","instructor","faculty"]);
+  state.batchColumn = findColumn(["batch","cohort","class","group"]);
+  state.dateColumn = findColumn(["completion time","completion date","response date","submitted date","date"]);
+
+  // If no obvious comment columns exist, use remaining high-text columns
+  // as qualitative fields, but exclude obvious metadata.
+  if(!commentColumns.length){
+    const fallbackComments = headers.filter(header=>{
+      if(ratingColumns.includes(header) || headerLooksLikeMeta(header)) return false;
+
+      const values = scanRows.map(row=>normalize(row[header])).filter(Boolean);
+      if(values.length < 2) return false;
+
+      const textRate = values.filter(v=>parseNumeric(v)===null).length / values.length;
+      const avgLength = values.reduce((sum,v)=>sum+v.length,0)/values.length;
+
+      return textRate >= 0.7 && avgLength >= 8;
+    }).slice(0,6);
+
+    state.commentColumns = fallbackComments;
+  }
+
+  return {
+    headers,
+    ratingCount: ratingColumns.length,
+    commentCount: state.commentColumns.length
+  };
+}
+
+function scaleLabel(scale){
+  return `${scale.min}–${scale.max}`;
+}
+
+function questionScore(data,column){
+  const scale = state.ratingMeta.get(column) || {min:1,max:5};
+  const values = data
+    .map(row=>parseNumeric(row[column]))
+    .filter(v=>v !== null && v >= scale.min && v <= scale.max);
+
+  if(!values.length) return null;
+
+  const avg = values.reduce((a,b)=>a+b,0)/values.length;
+  const pct = ((avg-scale.min)/(scale.max-scale.min))*100;
+
+  return {
+    avg,
+    pct: Math.max(0,Math.min(100,pct)),
+    n:values.length,
+    scale
+  };
+}
+
+function filteredRows(){
+  const trainer = $("trainerFilter").value;
+  const batch = $("batchFilter").value;
+  const date = $("dateFilter").value;
+
+  return state.rows.filter(row=>{
+    if(trainer !== "ALL" && normalize(row[state.trainerColumn]) !== trainer) return false;
+    if(batch !== "ALL" && normalize(row[state.batchColumn]) !== batch) return false;
+    if(date !== "ALL" && dateKey(row[state.dateColumn]) !== date) return false;
+    return true;
+  });
+}
+
+function dateKey(value){
+  if(value instanceof Date && !isNaN(value)) return [
+    value.getFullYear(),
+    String(value.getMonth()+1).padStart(2,"0"),
+    String(value.getDate()).padStart(2,"0")
+  ].join("-");
+
+  const text = normalize(value);
+  if(!text) return "";
+
+  const d = new Date(text);
+  if(!isNaN(d)) return [
+    d.getFullYear(),
+    String(d.getMonth()+1).padStart(2,"0"),
+    String(d.getDate()).padStart(2,"0")
+  ].join("-");
+
+  return "";
+}
+
+function formatDate(value){
+  const d = new Date(value);
+  if(isNaN(d)) return normalize(value) || "—";
+  return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+}
+
+function shortLabel(question){
+  let text = normalize(question);
+
+  text = text
+    .replace(/^please\s+/i,"")
+    .replace(/^on a scale of .*?,?\s*/i,"")
+    .replace(/\(.*?\)/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+
+  if(text.length <= 54) return text;
+  return text.slice(0,51).replace(/\s+\S*$/,"")+"…";
+}
+
+function strongestAndFocus(questions){
+  const usable = questions.filter(q=>q.score);
+  return {
+    strongest:[...usable].sort((a,b)=>b.score.pct-a.score.pct)[0] || null,
+    focus:[...usable].sort((a,b)=>a.score.pct-b.score.pct)[0] || null
+  };
+}
+
+function summarizeQualitative(data){
+  const all = [];
+
+  state.commentColumns.forEach(column=>{
+    data.forEach(row=>{
+      const value = normalize(row[column]);
+      if(value && value.length >= 4) all.push({
+        text:value,
+        column
+      });
+    });
+  });
+
+  return all;
+}
+
+function stopwords(){
+  return new Set([
+    "the","and","was","were","for","that","with","this","from","have","has","had","very",
+    "more","they","their","there","about","into","just","would","could","should","also",
+    "training","trainer","session","learn","learning","good","great","really","well",
+    "what","when","where","which","while","your","you","our","are","is","to","of","in",
+    "on","a","an","it","i","we","me","my","as","be","or","but","so","if","at","by","not",
+    "than","then","all","was","been","being","can","will","do","did","during","through"
+  ]);
+}
+
+function topTerms(comments){
+  const counts = new Map();
+  const stop = stopwords();
+
+  comments.forEach(item=>{
+    const words = item.text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g," ")
+      .split(/\s+/)
+      .filter(word=>word.length >= 4 && !stop.has(word));
+
+    words.forEach(word=>counts.set(word,(counts.get(word)||0)+1));
+  });
+
+  return [...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5);
+}
+
+function summarizeComments(comments,fallback){
+  if(!comments.length) return fallback;
+
+  const terms = topTerms(comments);
+  const examples = comments.slice(0,3).map(x=>`“${x.text}”`);
+
+  const termText = terms.length
+    ? `Frequent terms: ${terms.map(([w,n])=>`${w} (${n})`).join(", ")}.`
+    : "";
+
+  return `${termText} ${examples.join(" ")}`.trim();
+}
+
+function populateFilters(){
+  const hasFilters = state.trainerColumn || state.batchColumn || state.dateColumn;
+  $("filters").classList.toggle("hidden",!hasFilters);
+
+  if(state.trainerColumn){
+    const values = [...new Set(state.rows.map(r=>normalize(r[state.trainerColumn])).filter(Boolean))].sort();
+    $("trainerFilter").innerHTML =
+      `<option value="ALL">All Trainers</option>`+
+      values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  }else{
+    $("trainerFilter").innerHTML=`<option value="ALL">Trainer field not detected</option>`;
+  }
+
+  if(state.batchColumn){
+    const values = [...new Set(state.rows.map(r=>normalize(r[state.batchColumn])).filter(Boolean))].sort();
+    $("batchFilter").innerHTML =
+      `<option value="ALL">All Batches / Cohorts</option>`+
+      values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  }else{
+    $("batchFilter").innerHTML=`<option value="ALL">Batch field not detected</option>`;
+  }
+
+  if(state.dateColumn){
+    const dates = [...new Set(state.rows.map(r=>dateKey(r[state.dateColumn])).filter(Boolean))].sort().reverse();
+    $("dateFilter").innerHTML =
+      `<option value="ALL">All Dates</option>`+
+      dates.map(v=>`<option value="${v}">${formatDate(v)}</option>`).join("");
+  }else{
+    $("dateFilter").innerHTML=`<option value="ALL">Date field not detected</option>`;
+  }
+}
+
+function render(){
+  const data = filteredRows();
+
+  const questions = state.ratingColumns.map(column=>({
+    column,
+    score:questionScore(data,column)
+  })).filter(x=>x.score);
+
+  const totalPossible = questions.reduce((sum,q)=>sum+q.score.n,0);
+  const totalCells = Math.max(1,data.length * Math.max(1,state.ratingColumns.length));
+  const overallAverage = totalPossible
+    ? questions.reduce((sum,q)=>sum+(q.score.avg*q.score.n),0)/totalPossible
+    : 0;
+
+  const percentages = questions.map(q=>q.score.pct);
+  const overallPct = percentages.length
+    ? questions.reduce((sum,q)=>sum+(q.score.pct*q.score.n),0)/totalPossible
+    : 0;
+
+  const coverage = Math.round((totalPossible/totalCells)*100);
+  const {strongest,focus} = strongestAndFocus(questions);
+  const qualitative = summarizeQualitative(data);
+
+  $("kpiResponses").textContent = data.length.toLocaleString();
+  $("kpiQuestions").textContent = state.ratingColumns.length;
+  $("kpiCoverage").textContent = `${coverage}%`;
+
+  const dominantScale = questions.length
+    ? questions[0].score.scale
+    : {min:1,max:5};
+
+  $("kpiAverage").textContent =
+    `${overallAverage.toFixed(2)} / ${dominantScale.max}`;
+
+  $("kpiAveragePct").textContent =
+    `${overallPct.toFixed(1)}% of inferred scale`;
+
+  $("chartNote").textContent =
+    `${questions.length} detected rating questions · ${state.commentColumns.length} qualitative fields`;
+
+  $("questionBars").innerHTML = questions.length
+    ? questions.map(q=>{
+        const fill = q.score.pct >= 85 ? "var(--teal)" : q.score.pct >= 70 ? "var(--amber)" : "var(--red)";
+        return `
+          <div class="bar-row">
+            <div class="bar-name" title="${esc(q.column)}">${esc(shortLabel(q.column))}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${q.score.pct}%;background:${fill}"></div></div>
+            <div class="bar-value">${q.score.avg.toFixed(2)}</div>
+          </div>
+        `;
+      }).join("")
+    : `<div class="note">No rating-style questions were detected in the current selection.</div>`;
+
+  if(strongest){
+    $("strongestTitle").textContent = shortLabel(strongest.column);
+    $("strongestBig").textContent = `${strongest.score.avg.toFixed(2)} / ${strongest.score.scale.max}`;
+    $("strongestText").textContent = `${strongest.score.n.toLocaleString()} usable responses · ${strongest.score.pct.toFixed(1)}% on the inferred ${scaleLabel(strongest.score.scale)} scale.`;
+  }else{
+    $("strongestTitle").textContent="—";
+    $("strongestBig").textContent="—";
+    $("strongestText").textContent="No rating data available.";
+  }
+
+  if(focus){
+    $("focusTitle").textContent = shortLabel(focus.column);
+    $("focusBig").textContent = `${focus.score.avg.toFixed(2)} / ${focus.score.scale.max}`;
+    $("focusText").textContent = `${focus.score.n.toLocaleString()} usable responses · ${focus.score.pct.toFixed(1)}% on the inferred ${scaleLabel(focus.score.scale)} scale.`;
+  }else{
+    $("focusTitle").textContent="—";
+    $("focusBig").textContent="—";
+    $("focusText").textContent="No rating data available.";
+  }
+
+  const valuable = qualitative.filter(x=>
+    /valuable|useful|helpful|benefit|liked|enjoyed|best|strength/i.test(normalize(x.column))
   );
 
-  if(matchedQuestions.length < 15){
+  const improvements = qualitative.filter(x=>
+    /improv|suggest|change|could|least|better|issue|recommend/i.test(normalize(x.column))
+  );
+
+  const valueSource = valuable.length ? valuable : qualitative;
+  const improvementSource = improvements.length ? improvements : qualitative.slice().reverse();
+
+  $("valuableComments").textContent = summarizeComments(
+    valueSource,
+    "No qualitative value comments were detected."
+  );
+
+  $("improvementComments").textContent = summarizeComments(
+    improvementSource,
+    "No qualitative improvement comments were detected."
+  );
+
+  let ratingText;
+  if(overallPct >= 90) ratingText="Learner sentiment is exceptionally positive.";
+  else if(overallPct >= 80) ratingText="Learner sentiment is strong overall, with targeted improvement opportunities.";
+  else if(overallPct >= 70) ratingText="Learner sentiment is acceptable, but several signals merit attention.";
+  else ratingText="Learner feedback indicates a need for focused intervention.";
+
+  $("insightHeading").textContent = ratingText;
+  $("insightText").textContent = focus
+    ? `Across ${data.length.toLocaleString()} responses and ${state.ratingColumns.length} detected rating questions, the overall learner signal is ${overallAverage.toFixed(2)}. The strongest signal is "${shortLabel(strongest?.column || "")}" and the clearest opportunity is "${shortLabel(focus.column)}".`
+    : "Upload a feedback file or reset the demo to generate an L&D interpretation.";
+
+  window.currentAnalysis = {
+    data,
+    questions,
+    overallAverage,
+    overallPct,
+    coverage,
+    strongest,
+    focus,
+    qualitative
+  };
+}
+
+function buildDemo(){
+  const questionNames = [
+    "The training content was clear and easy to understand.",
+    "The examples were relevant to my work.",
+    "The training materials were helpful.",
+    "The trainer explained the topics effectively.",
+    "The trainer answered questions clearly.",
+    "The trainer kept the session engaging.",
+    "The trainer encouraged participation.",
+    "The trainer was knowledgeable.",
+    "The training pace was comfortable.",
+    "I feel more confident after the training.",
+    "The training improved my knowledge and skills.",
+    "The training met my learning needs.",
+    "I would recommend this training to others.",
+    "Overall, I am satisfied with the training."
+  ];
+
+  state.rows = [];
+  for(let i=0;i<30;i++){
+    const row = {
+      "Trainer":["Demo Trainer A","Demo Trainer B","Demo Trainer C"][i%3],
+      "Batch":["Demo-46","Demo-47"][i%2],
+      "Completion Date":new Date(2026,4,(i%20)+1),
+      "What was most valuable?":[
+        "Practical examples and trainer explanations.",
+        "The practice activities were useful.",
+        "The trainer made the topic easy to understand."
+      ][i%3],
+      "What could be improved?":[
+        "More time for practice would help.",
+        "More role-specific examples would be useful.",
+        "The pace could be slightly slower."
+      ][i%3]
+    };
+
+    questionNames.forEach((q,j)=>{
+      let base = 4;
+      if(j===4 || j===7 || j===13) base = 4.5;
+      if(j===1 || j===8) base = 3.8;
+      const variation = ((i+j)%5)-2;
+      row[q] = Math.max(1,Math.min(5,Math.round(base + variation*0.18)));
+    });
+
+    state.rows.push(row);
+  }
+
+  state.workbookName = "Demo Dataset";
+  state.sheetName = "Demo";
+  detectStructure(state.rows);
+  populateFilters();
+  resetFilterValues();
+  render();
+  $("dataStatus").className="status good";
+  $("dataStatus").textContent="Demo data loaded · 30 responses · 14 detected rating questions.";
+}
+
+function resetFilterValues(){
+  $("trainerFilter").value="ALL";
+  $("batchFilter").value="ALL";
+  $("dateFilter").value="ALL";
+}
+
+async function parseUploadedFile(file){
+  if(!window.XLSX){
+    await loadSpreadsheetParser();
+  }
+
+  if(!window.XLSX) throw new Error("The spreadsheet parser could not be loaded.");
+
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer,{type:"array",raw:true,cellDates:true});
+
+  const chosen = chooseBestSheet(workbook);
+  if(!chosen || !chosen.rows.length){
+    throw new Error("No usable response table was found in the uploaded workbook.");
+  }
+
+  const structure = detectStructure(chosen.rows);
+
+  if(structure.ratingCount === 0){
     throw new Error(
-      `This does not look like the GG LearnLabs L1 export. Only ${matchedQuestions.length} of 22 rating questions were found.`
+      "I could not detect any rating-style questions. The file needs response rows with numeric Likert-style answers such as 1–5 or 1–10."
     );
   }
 
-  return raw;
+  state.rows = chosen.rows;
+  state.workbookName = file.name;
+  state.sheetName = chosen.name;
+
+  populateFilters();
+  resetFilterValues();
+  render();
+
+  $("dataStatus").className="status good";
+  $("dataStatus").textContent =
+    `${file.name} loaded successfully · ${state.rows.length.toLocaleString()} responses · ${structure.ratingCount} rating questions · ${structure.commentCount} qualitative fields detected.`;
 }
 
-async function handleFile(file){
-  $("dataStatus").className = "status";
-  $("dataStatus").textContent = `Reading ${file.name}...`;
+async function loadSpreadsheetParser(){
+  if(window.XLSX) return true;
 
-  try{
-    const parsed = await parseWorkbook(file);
-    rows = parsed;
-    populateFilters(rows);
-    $("dateFilter").value = "";
-    render();
+  const sources = [
+    "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+    "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"
+  ];
 
-    $("dataStatus").className = "status good";
-    $("dataStatus").textContent =
-      `${file.name} loaded successfully · ${rows.length.toLocaleString()} responses found.`;
-  }catch(error){
-    console.error(error);
-    $("dataStatus").className = "status error";
-    $("dataStatus").textContent = error.message || "Could not read the file.";
-    alert(error.message || "Could not read the file.");
-  }
-}
-
-function buildPdfReport(){
-  const a = window.currentAnalysis || aggregate(filterRows());
-
-  const rating =
-    a.overallPct >= 90 ? "EXCEPTIONAL" :
-    a.overallPct >= 80 ? "STRONG" :
-    a.overallPct >= 70 ? "SATISFACTORY" :
-    "ACTION REQUIRED";
-
-  const fill = a.overallPct >= 85 ? "#178f7f" : a.overallPct >= 70 ? "#c98518" : "#c85656";
-
-  $("pdfReport").innerHTML = `
-    <div style="
-      width:794px;height:1123px;padding:34px 36px 28px;
-      background:linear-gradient(135deg,#edf8f5,#f8fbfa 48%,#fff7e9);
-      color:#182725;font-family:Arial,Helvetica,sans-serif;overflow:hidden;
-      display:flex;flex-direction:column;
-    ">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #178f7f;padding-bottom:14px;">
-        <div>
-          <div style="font:bold 9px Arial;color:#178f7f;letter-spacing:1.5px;">GG LEARNLABS · LEARNING & DEVELOPMENT</div>
-          <div style="font:bold 24px Arial;color:#182725;margin-top:4px;">Level 1 Training Feedback Report</div>
-        </div>
-        <div style="font:10px/1.5 Arial;color:#667774;text-align:right;">
-          <b>Responses</b><br>${a.responses.toLocaleString()}
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:190px 1fr;gap:18px;margin-top:13px;">
-        <div style="background:#173a35;color:#fff;border-radius:14px;padding:16px;min-height:146px;">
-          <div style="font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px;">OVERALL LEARNER SCORE</div>
-          <div style="font:bold 45px Arial;margin-top:8px;">${a.overallAverage.toFixed(2)}</div>
-          <div style="font:9px Arial;color:#d1e6e1;margin-top:2px;">out of 5 · ${a.overallPct.toFixed(1)}%</div>
-          <div style="display:inline-block;margin-top:11px;padding:5px 9px;border-radius:999px;background:${fill};color:#06201c;font:bold 8px Arial;">${rating}</div>
-        </div>
-
-        <div style="background:#fff;border:1px solid #dce6e3;border-radius:14px;padding:15px;">
-          <div style="font:bold 8px Arial;color:#178f7f;letter-spacing:1px;">EXECUTIVE READOUT</div>
-          <div style="font:bold 18px Arial;color:#1d2e2b;margin-top:5px;">
-            ${rating === "EXCEPTIONAL" ? "Learner experience is exceptionally positive." :
-              rating === "STRONG" ? "Learner experience is strong overall." :
-              rating === "SATISFACTORY" ? "Learner experience is satisfactory with clear opportunities." :
-              "Learner feedback signals a need for focused intervention."}
-          </div>
-          <div style="font:9.5px/1.55 Arial;color:#5e6f6b;margin-top:7px;">
-            The current response set averages ${a.overallAverage.toFixed(2)} / 5.
-            ${a.top ? `The strongest signal is "${esc(shortLabel(a.top.column))}" at ${a.top.avg.toFixed(2)}.` : ""}
-            ${a.focus ? `The clearest opportunity is "${esc(shortLabel(a.focus.column))}" at ${a.focus.avg.toFixed(2)}.` : ""}
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">
-            <div style="background:#f2f8f6;border-radius:9px;padding:8px;"><b style="font:bold 15px Arial;color:#178f7f;">${a.questions.filter(q=>q.avg>=4.5).length}</b><div style="font:7px Arial;color:#70817d;margin-top:2px;">TOP-TIER ITEMS</div></div>
-            <div style="background:#f2f8f6;border-radius:9px;padding:8px;"><b style="font:bold 15px Arial;color:#178f7f;">${a.questions.filter(q=>q.avg<4).length}</b><div style="font:7px Arial;color:#70817d;margin-top:2px;">FOCUS ITEMS</div></div>
-            <div style="background:#f2f8f6;border-radius:9px;padding:8px;"><b style="font:bold 15px Arial;color:#178f7f;">22</b><div style="font:7px Arial;color:#70817d;margin-top:2px;">RATED QUESTIONS</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;justify-content:space-between;align-items:end;margin-top:14px;padding-bottom:7px;border-bottom:1px solid #dce6e3;">
-        <b style="font:bold 12px Arial;color:#1c2d2a;">Question-wise performance</b>
-        <span style="font:8px Arial;color:#71817e;">Average on 5-point learner scale</span>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:22px;row-gap:8px;margin-top:10px;">
-        ${a.questions.map(q=>{
-          const width=q.pct;
-          const bar=q.avg>=4.25 ? "#178f7f" : q.avg>=3.5 ? "#c98518" : "#c85656";
-          return `
-            <div style="display:grid;grid-template-columns:118px 1fr 42px;gap:7px;align-items:center;">
-              <div style="font:bold 7.4px/1.25 Arial;color:#354642;">${esc(shortLabel(q.column))}</div>
-              <div style="height:7px;background:#e2eae7;border-radius:999px;overflow:hidden;"><div style="height:100%;width:${width}%;background:${bar};"></div></div>
-              <div style="text-align:right;font:bold 8px Arial;color:#1c2d2a;">${q.avg.toFixed(2)}</div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:13px;">
-        <div style="background:#effaf6;border:1px solid #d6e7e1;border-radius:11px;padding:11px;">
-          <div style="font:bold 7px Arial;color:#178f7f;letter-spacing:.9px;">STRONGEST SIGNAL</div>
-          <div style="font:bold 10px/1.3 Arial;color:#243532;margin-top:6px;">${esc(shortLabel(a.top?.column||"—"))}</div>
-          <div style="font:bold 17px Arial;color:#178f7f;margin-top:4px;">${a.top ? a.top.avg.toFixed(2) : "—"}</div>
-        </div>
-        <div style="background:#fff7eb;border:1px solid #ecdcc3;border-radius:11px;padding:11px;">
-          <div style="font:bold 7px Arial;color:#c98518;letter-spacing:.9px;">BIGGEST OPPORTUNITY</div>
-          <div style="font:bold 10px/1.3 Arial;color:#243532;margin-top:6px;">${esc(shortLabel(a.focus?.column||"—"))}</div>
-          <div style="font:bold 17px Arial;color:#c98518;margin-top:4px;">${a.focus ? a.focus.avg.toFixed(2) : "—"}</div>
-        </div>
-        <div style="background:#f0f6fe;border:1px solid #dbe6f2;border-radius:11px;padding:11px;">
-          <div style="font:bold 7px Arial;color:#4778ba;letter-spacing:.9px;">RECOMMENDATION SIGNAL</div>
-          <div style="font:bold 10px/1.3 Arial;color:#243532;margin-top:6px;">${a.focus ? "Target the focus item" : "No focus item"}</div>
-          <div style="font:bold 17px Arial;color:#4778ba;margin-top:4px;">${a.focus ? a.focus.avg.toFixed(2)+"/5" : "—"}</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px;">
-        <div style="background:#fff;border:1px solid #dce6e3;border-radius:11px;padding:12px;min-height:112px;">
-          <div style="font:bold 8px Arial;color:#178f7f;letter-spacing:1px;text-transform:uppercase;">Learner value themes</div>
-          <div style="font:8px/1.5 Arial;color:#566662;margin-top:7px;">${esc(summarizeComments(a.valuable,"Practical content, trainer support and relevant examples were valued."))}</div>
-        </div>
-        <div style="background:#fff;border:1px solid #dce6e3;border-radius:11px;padding:12px;min-height:112px;">
-          <div style="font:bold 8px Arial;color:#c98518;letter-spacing:1px;text-transform:uppercase;">Improvement themes</div>
-          <div style="font:8px/1.5 Arial;color:#566662;margin-top:7px;">${esc(summarizeComments(a.improvements,"No consistent improvement theme was identified from the available comments."))}</div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px;background:#173a35;border-radius:11px;padding:13px 14px;color:#fff;">
-        <div style="font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px;text-transform:uppercase;">L&amp;D ACTION</div>
-        <div style="font:bold 12px Arial;margin-top:5px;">
-          ${a.focus ? `Review and improve: ${esc(shortLabel(a.focus.column))}` : "Review the learner feedback profile."}
-        </div>
-        <div style="font:8.3px/1.5 Arial;color:#d5e8e4;margin-top:4px;">
-          Use the lowest-rated learner signal as the starting point for program, trainer or delivery improvement. Combine this with qualitative comments before deciding the intervention.
-        </div>
-      </div>
-
-      <div style="margin-top:auto;padding-top:8px;border-top:1px solid #dce6e3;display:flex;justify-content:space-between;font:7px Arial;color:#7a8986;">
-        <span>GG LearnLabs · Level 1 Training Feedback</span>
-        <span>Client-side analysis · 22 rating questions</span>
-      </div>
-    </div>
-  `;
-}
-
-async function loadScriptWithFallback(urls, ready){
-  if(ready()) return true;
-
-  for(const url of urls){
+  for(const source of sources){
     const loaded = await new Promise(resolve=>{
       const script = document.createElement("script");
-      script.src = url;
+      script.src = source;
       script.async = true;
-
-      let settled = false;
-      const finish = ok => {
-        if(settled) return;
-        settled = true;
+      let done = false;
+      const finish = ok=>{
+        if(done) return;
+        done=true;
         resolve(ok);
       };
-
-      script.onload = () => finish(true);
-      script.onerror = () => finish(false);
+      script.onload=()=>finish(true);
+      script.onerror=()=>finish(false);
       document.head.appendChild(script);
-
-      setTimeout(() => finish(false), 12000);
+      setTimeout(()=>finish(false),12000);
     });
 
-    if(loaded && ready()) return true;
+    if(loaded && window.XLSX) return true;
   }
 
   return false;
 }
 
 async function ensurePdfLibraries(){
-  const canvasReady = await loadScriptWithFallback(
+  const canvasReady = await loadScript(
     [
       "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
       "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
       "https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"
     ],
-    () => typeof window.html2canvas === "function"
+    ()=>typeof window.html2canvas==="function"
   );
 
   if(!canvasReady) return false;
 
-  return await loadScriptWithFallback(
+  return await loadScript(
     [
       "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
       "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
       "https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"
     ],
-    () => window.jspdf && typeof window.jspdf.jsPDF === "function"
+    ()=>window.jspdf && typeof window.jspdf.jsPDF==="function"
   );
 }
 
+async function loadScript(urls,ready){
+  if(ready()) return true;
+
+  for(const url of urls){
+    const loaded = await new Promise(resolve=>{
+      const script=document.createElement("script");
+      script.src=url;
+      script.async=true;
+      let done=false;
+      const finish=ok=>{
+        if(done)return;
+        done=true;
+        resolve(ok);
+      };
+      script.onload=()=>finish(true);
+      script.onerror=()=>finish(false);
+      document.head.appendChild(script);
+      setTimeout(()=>finish(false),12000);
+    });
+    if(loaded && ready()) return true;
+  }
+  return false;
+}
+
+function pickPdfQuestions(questions){
+  // A one-page report cannot responsibly display 40–100 question bars.
+  // Show the top 5 and bottom 5 on the executive report, while the
+  // application screen continues to show every detected question.
+  if(questions.length <= 10) return questions;
+
+  const lowest = [...questions].sort((a,b)=>a.score.pct-b.score.pct).slice(0,5);
+  const highest = [...questions].sort((a,b)=>b.score.pct-a.score.pct).slice(0,5);
+
+  const map = new Map();
+  [...lowest,...highest].forEach(q=>map.set(q.column,q));
+
+  return [...map.values()];
+}
+
+function buildPdfReport(){
+  const a = window.currentAnalysis || {
+    data:filteredRows(),
+    questions:[],
+    overallAverage:0,
+    overallPct:0,
+    coverage:0,
+    strongest:null,
+    focus:null,
+    qualitative:[]
+  };
+
+  const rating =
+    a.overallPct>=90 ? "EXCEPTIONAL" :
+    a.overallPct>=80 ? "STRONG" :
+    a.overallPct>=70 ? "SATISFACTORY" :
+    "ACTION REQUIRED";
+
+  const ratingColor =
+    a.overallPct>=85 ? "#178f7f" :
+    a.overallPct>=70 ? "#c98518" :
+    "#c85656";
+
+  const pdfQuestions = pickPdfQuestions(a.questions);
+
+  const questionHtml = pdfQuestions.map(q=>{
+    const fill = q.score.pct>=85 ? "#178f7f" : q.score.pct>=70 ? "#c98518" : "#c85656";
+    return `
+      <div class="pdf-q">
+        <div class="pdf-q-name">${esc(shortLabel(q.column))}</div>
+        <div class="pdf-q-track"><div class="pdf-q-fill" style="width:${q.score.pct}%;background:${fill}"></div></div>
+        <div class="pdf-q-value">${q.score.avg.toFixed(2)}</div>
+      </div>
+    `;
+  }).join("");
+
+  const qualitative = a.qualitative || [];
+  const terms = topTerms(qualitative);
+  const termList = terms.length
+    ? terms.slice(0,4).map(([word,count])=>`<li>${esc(word)} · ${count} mentions</li>`).join("")
+    : "<li>No recurring text themes detected.</li>";
+
+  const strengths = [...a.questions]
+    .sort((x,y)=>y.score.pct-x.score.pct)
+    .slice(0,3)
+    .map(q=>`<li>${esc(shortLabel(q.column))} — ${q.score.avg.toFixed(2)}</li>`)
+    .join("");
+
+  const opportunities = [...a.questions]
+    .sort((x,y)=>x.score.pct-y.score.pct)
+    .slice(0,3)
+    .map(q=>`<li>${esc(shortLabel(q.column))} — ${q.score.avg.toFixed(2)}</li>`)
+    .join("");
+
+  const coverageText = pdfQuestions.length < a.questions.length
+    ? `Top / focus view shown · ${a.questions.length} questions detected`
+    : `${a.questions.length} questions detected`;
+
+  $("pdfReport").innerHTML=`
+    <div class="pdf-page">
+      <div class="pdf-header">
+        <div>
+          <div class="pdf-brand-kicker">GG LEARNLABS · LEARNING &amp; DEVELOPMENT</div>
+          <div class="pdf-title">Level 1 Feedback Report</div>
+        </div>
+        <div class="pdf-date">
+          <b>${esc(state.workbookName)}</b><br>
+          ${esc(state.sheetName)} · ${a.data.length.toLocaleString()} responses
+        </div>
+      </div>
+
+      <div class="pdf-meta">
+        <div class="pdf-meta-box"><div class="pdf-meta-label">Rating Questions</div><div class="pdf-meta-value">${a.questions.length}</div></div>
+        <div class="pdf-meta-box"><div class="pdf-meta-label">Qualitative Fields</div><div class="pdf-meta-value">${state.commentColumns.length}</div></div>
+        <div class="pdf-meta-box"><div class="pdf-meta-label">Trainer Field</div><div class="pdf-meta-value">${esc(state.trainerColumn ? "Detected" : "Not found")}</div></div>
+        <div class="pdf-meta-box"><div class="pdf-meta-label">Response Coverage</div><div class="pdf-meta-value">${a.coverage}%</div></div>
+      </div>
+
+      <div class="pdf-hero">
+        <div class="pdf-score">
+          <div class="pdf-score-label">OVERALL LEARNER SIGNAL</div>
+          <div class="pdf-score-num">${a.overallAverage.toFixed(2)}</div>
+          <div class="pdf-score-sub">inferred learner rating · ${a.overallPct.toFixed(1)}%</div>
+          <div class="pdf-pill" style="background:${ratingColor}">${rating}</div>
+        </div>
+
+        <div class="pdf-exec">
+          <div class="pdf-exec-label">EXECUTIVE READOUT</div>
+          <div class="pdf-exec-title">${
+            a.overallPct>=90 ? "Learner experience is exceptionally positive." :
+            a.overallPct>=80 ? "Learner experience is strong overall." :
+            a.overallPct>=70 ? "Learner experience is satisfactory with clear opportunities." :
+            "Learner feedback requires focused attention."
+          }</div>
+          <div class="pdf-exec-text">
+            ${a.focus
+              ? `The strongest signal is "${esc(shortLabel(a.strongest?.column||"—"))}" at ${a.strongest.score.avg.toFixed(2)}. The clearest opportunity is "${esc(shortLabel(a.focus.column))}" at ${a.focus.score.avg.toFixed(2)}.`
+              : "No clear rating signal was available."}
+          </div>
+
+          <div class="pdf-stats">
+            <div class="pdf-stat"><b>${a.data.length.toLocaleString()}</b><div>RESPONSES</div></div>
+            <div class="pdf-stat"><b>${a.coverage}%</b><div>USABLE COVERAGE</div></div>
+            <div class="pdf-stat"><b>${pdfQuestions.length}</b><div>VISIBLE SIGNALS</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdf-section-title">
+        <strong>Performance profile</strong>
+        <span>${coverageText}</span>
+      </div>
+
+      <div class="pdf-question-grid">${questionHtml}</div>
+
+      <div class="pdf-insights">
+        <div class="pdf-insight g">
+          <div class="pdf-insight-label">STRONGEST SIGNAL</div>
+          <div class="pdf-insight-title">${esc(shortLabel(a.strongest?.column||"—"))}</div>
+          <div class="pdf-insight-score">${a.strongest ? a.strongest.score.avg.toFixed(2) : "—"}</div>
+        </div>
+        <div class="pdf-insight a">
+          <div class="pdf-insight-label">BIGGEST OPPORTUNITY</div>
+          <div class="pdf-insight-title">${esc(shortLabel(a.focus?.column||"—"))}</div>
+          <div class="pdf-insight-score">${a.focus ? a.focus.score.avg.toFixed(2) : "—"}</div>
+        </div>
+        <div class="pdf-insight b">
+          <div class="pdf-insight-label">QUALITATIVE SIGNAL</div>
+          <div class="pdf-insight-title">${state.commentColumns.length} text field${state.commentColumns.length===1?"":"s"} detected</div>
+          <div class="pdf-insight-score">${qualitative.length}</div>
+        </div>
+      </div>
+
+      <div class="pdf-bottom">
+        <div class="pdf-box">
+          <div class="pdf-box-title">Top-rated areas</div>
+          <ul class="pdf-list">${strengths || "<li>No rating data</li>"}</ul>
+        </div>
+        <div class="pdf-box">
+          <div class="pdf-box-title">Priority areas</div>
+          <ul class="pdf-list">${opportunities || "<li>No rating data</li>"}</ul>
+        </div>
+      </div>
+
+      <div class="pdf-action">
+        <div class="pdf-action-label">L&amp;D ACTION</div>
+        <div class="pdf-action-title">${a.focus ? `Investigate: ${esc(shortLabel(a.focus.column))}` : "Review the learner feedback profile."}</div>
+        <div class="pdf-action-text">
+          Use the lowest-rated learner signal as the starting point for improvement.
+          Combine this with qualitative comments, trainer observation and learning application evidence before deciding the intervention.
+          ${terms.length ? ` Common qualitative terms include ${terms.slice(0,3).map(([w])=>esc(w)).join(", ")}.` : ""}
+        </div>
+      </div>
+
+      <div class="pdf-footer">
+        <span>GG LearnLabs · Universal L1 Feedback Analyzer</span>
+        <span>Client-side analysis · ${a.questions.length} rating questions detected</span>
+      </div>
+    </div>
+  `;
+}
+
 async function exportPDF(){
-  const button = $("exportButton");
-  const report = $("pdfReport");
-  const original = button.textContent;
+  const button=$("exportButton");
+  const report=$("pdfReport");
+  const original=button.textContent;
 
   try{
-    button.disabled = true;
-    button.textContent = "Preparing 1-page PDF...";
+    button.disabled=true;
+    button.textContent="Preparing 1-page PDF...";
 
     if(!(await ensurePdfLibraries())){
       throw new Error("The PDF libraries could not be loaded. Please check your internet connection and try again.");
@@ -840,144 +1125,111 @@ async function exportPDF(){
     buildPdfReport();
 
     document.body.classList.add("pdf-exporting");
-    report.style.display = "block";
-    report.style.visibility = "visible";
-    report.style.opacity = "1";
-    report.style.position = "absolute";
-    report.style.left = "0";
-    report.style.top = "0";
-    report.style.zIndex = "99999";
+    report.style.display="block";
+    report.style.visibility="visible";
+    report.style.opacity="1";
+    report.style.zIndex="99999";
 
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(r=>setTimeout(r,300));
 
-    if(document.fonts && document.fonts.ready){
-      try { await document.fonts.ready; } catch(_) {}
-    }
-
-    await new Promise(resolve =>
-      requestAnimationFrame(() =>
-        requestAnimationFrame(resolve)
-      )
-    );
-
-    const canvas = await window.html2canvas(report, {
-      scale: 2,
-      backgroundColor: "#f8fbfa",
-      useCORS: false,
-      allowTaint: false,
-      logging: false,
-      imageTimeout: 0,
-      width: 794,
-      height: 1123,
-      windowWidth: 794,
-      windowHeight: 1123,
-      scrollX: 0,
-      scrollY: 0
+    const canvas=await html2canvas(report,{
+      scale:2,
+      backgroundColor:"#f8fbfa",
+      useCORS:false,
+      allowTaint:false,
+      logging:false,
+      imageTimeout:0,
+      width:794,
+      height:1123,
+      windowWidth:794,
+      windowHeight:1123,
+      scrollX:0,
+      scrollY:0
     });
 
-    if(!canvas || canvas.width < 500 || canvas.height < 700){
+    if(!canvas || canvas.width<500 || canvas.height<700){
       throw new Error("The report could not be rendered for PDF export.");
     }
 
-    const imageData = canvas.toDataURL("image/jpeg", 0.98);
+    const img=canvas.toDataURL("image/jpeg",0.98);
+    if(!img || img.length<5000) throw new Error("The rendered report is empty.");
 
-    if(!imageData || imageData.length < 5000){
-      throw new Error("The rendered report image is empty.");
-    }
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
+    pdf.addImage(img,"JPEG",0,0,210,297,undefined,"FAST");
 
-    const {jsPDF} = window.jspdf;
-    const pdf = new jsPDF({
-      orientation:"portrait",
-      unit:"mm",
-      format:"a4",
-      compress:true
-    });
+    const trainer = $("trainerFilter").value !== "ALL"
+      ? safeFileName($("trainerFilter").value)
+      : "all-trainers";
 
-    pdf.addImage(imageData, "JPEG", 0, 0, 210, 297, undefined, "FAST");
+    const filename=`L1_Feedback_${trainer}_one-page.pdf`;
+    const blob=pdf.output("blob");
 
-    const trainer =
-      $("trainerFilter").value === "ALL"
-        ? "all-trainers"
-        : safeFileName($("trainerFilter").value);
+    if(!blob || blob.size<5000) throw new Error("The generated PDF is empty.");
 
-    const filename = `L1_Feedback_${trainer}_one-page.pdf`;
-    const blob = pdf.output("blob");
-
-    if(!blob || blob.size < 5000){
-      throw new Error("The generated PDF is empty.");
-    }
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = filename;
-    link.style.display = "none";
-
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.href=url;
+    link.download=filename;
+    link.style.display="none";
     document.body.appendChild(link);
     link.click();
     link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1200);
 
-    setTimeout(() => URL.revokeObjectURL(url), 1200);
-
-    button.textContent = "Report Downloaded ✓";
-
-    setTimeout(() => {
-      button.textContent = original;
-      button.disabled = false;
-    }, 2200);
+    button.textContent="Report Downloaded ✓";
+    setTimeout(()=>{
+      button.textContent=original;
+      button.disabled=false;
+    },2200);
 
   }catch(error){
-    console.error("L1 PDF export error:", error);
-    button.textContent = original;
-    button.disabled = false;
+    console.error("L1 PDF export error:",error);
+    button.textContent=original;
+    button.disabled=false;
     alert(error.message || "The report could not be exported.");
   }finally{
     document.body.classList.remove("pdf-exporting");
-    report.style.display = "none";
-    report.style.visibility = "hidden";
-    report.style.opacity = "0";
+    report.style.display="none";
   }
 }
 
-function safeFileName(value){
-  return String(value||"file").replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").toLowerCase() || "file";
-}
-
-$("fileInput").addEventListener("change",e=>{
-  const file=e.target.files?.[0];
-  if(file) handleFile(file);
+$("fileInput").addEventListener("change",event=>{
+  const file=event.target.files?.[0];
+  if(file){
+    $("dataStatus").className="status";
+    $("dataStatus").textContent=`Reading ${file.name}...`;
+    parseUploadedFile(file).catch(error=>{
+      console.error(error);
+      $("dataStatus").className="status error";
+      $("dataStatus").textContent=error.message;
+      alert(error.message);
+    });
+  }
 });
 
+$("resetDemo").addEventListener("click",buildDemo);
 $("trainerFilter").addEventListener("change",render);
 $("batchFilter").addEventListener("change",render);
 $("dateFilter").addEventListener("change",render);
 $("exportButton").addEventListener("click",exportPDF);
 
-$("resetDemo").addEventListener("click",()=>{
-  rows = demoRows.map(row=>({...row}));
-  populateFilters(rows);
-  $("dateFilter").value="";
-  render();
-  $("dataStatus").className="status good";
-  $("dataStatus").textContent="Demo data restored · 30 sample learner responses loaded.";
-});
-
 $("themeToggle").addEventListener("click",()=>{
-  const current=document.documentElement.getAttribute("data-theme") || "dark";
-  const next=current==="dark" ? "light" : "dark";
+  const current=document.documentElement.getAttribute("data-theme")||"dark";
+  const next=current==="dark"?"light":"dark";
   document.documentElement.setAttribute("data-theme",next);
-  $("themeToggle").setAttribute("aria-label",next==="dark" ? "Switch to light mode" : "Switch to dark mode");
+  $("themeToggle").setAttribute("aria-label",next==="dark"?"Switch to light mode":"Switch to dark mode");
   localStorage.setItem("ggL1Theme",next);
 });
 
-const savedTheme=localStorage.getItem("ggL1Theme");
-document.documentElement.setAttribute("data-theme",savedTheme==="light" ? "light" : "dark");
+document.documentElement.setAttribute(
+  "data-theme",
+  localStorage.getItem("ggL1Theme")==="light" ? "light" : "dark"
+);
 
-demoRows = makeDemoData();
-rows = demoRows.map(row=>({...row}));
-populateFilters(rows);
-render();
+buildDemo();
 </script>
+
+<!-- Spreadsheet parser is loaded lazily for faster page load and robust fallback handling. -->
 </body>
 </html>
