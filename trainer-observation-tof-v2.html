@@ -193,15 +193,27 @@
     footer{padding:30px 0 0;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}
 
     /* PDF template */
-    #pdfReport{
-      position:fixed;
-      left:-100000px;
+    body.pdf-exporting .page,
+body.pdf-exporting .grid{
+      visibility:hidden !important;
+}
+
+body.pdf-exporting{
+      overflow:hidden !important;
+}
+
+#pdfReport{
+      position:absolute;
+      left:0;
       top:0;
       width:794px;
       background:#fff;
       color:#1b2927;
       padding:42px 48px;
       font-family:Arial,Helvetica,sans-serif;
+      display:none;
+      visibility:hidden;
+      opacity:0;
     }
     #pdfReport .pdf-header{border-bottom:2px solid #138f7e;padding-bottom:16px;margin-bottom:20px}
     #pdfReport .pdf-brand{font:bold 13px Arial;color:#138f7e;letter-spacing:1.2px}
@@ -838,78 +850,101 @@
     }
 
     async function exportPDF(){
-      const button=$("exportButton");
-      const originalText=button.textContent;
+      const button = $("exportButton");
+      const originalText = button.textContent;
+      const report = $("pdfReport");
 
-      try{
-        button.disabled=true;
-        button.textContent="Preparing PDF…";
+      try {
+        button.disabled = true;
+        button.textContent = "Preparing PDF...";
 
-        const loaded=await ensureHtml2Pdf();
+        const loaded = await ensureHtml2Pdf();
 
-        if(!loaded){
+        if (!loaded || typeof window.html2pdf !== "function") {
           throw new Error("html2pdf.js could not be loaded.");
         }
 
         buildPdfReport();
 
-        const element=$("pdfReport");
-        element.style.display="block";
+        // html2canvas cannot reliably capture an element positioned far
+        // outside the viewport. Put the report at 0,0 temporarily and hide
+        // the application UI while it is being rendered.
+        document.body.classList.add("pdf-exporting");
+        report.style.display = "block";
+        report.style.visibility = "visible";
+        report.style.opacity = "1";
 
-        /*
-          html2pdf needs a measurable element. The report is temporarily placed
-          off-screen but remains in the document flow for rendering.
-        */
-        const filename=
-          `${safeFileName($("trainerName").value||"trainer")}_TOF_${safeFileName($("classTopic").value||"observation")}.pdf`;
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
 
-        const options={
-          margin:[12,12,16,12],
+        // Let the browser perform one layout/repaint before html2canvas reads it.
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        const filename =
+          `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`;
+
+        const options = {
+          margin: [10, 10, 14, 10],
           filename,
-          image:{type:"jpeg",quality:0.98},
-          html2canvas:{
-            scale:2,
-            useCORS:true,
-            allowTaint:false,
-            backgroundColor:"#ffffff",
-            logging:false
+          image: {
+            type: "jpeg",
+            quality: 0.98
           },
-          jsPDF:{
-            unit:"mm",
-            format:"a4",
-            orientation:"portrait",
-            compress:true
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 794
           },
-          pagebreak:{
-            mode:["css","legacy"],
-            avoid:[".pdf-section",".pdf-criterion",".pdf-box",".pdf-insight"]
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+            compress: true
+          },
+          pagebreak: {
+            mode: ["css", "legacy"],
+            avoid: [
+              ".pdf-section",
+              ".pdf-criterion",
+              ".pdf-box",
+              ".pdf-insight"
+            ]
           }
         };
 
         await window.html2pdf()
           .set(options)
-          .from(element)
+          .from(report)
           .save();
 
-        button.textContent="PDF Downloaded ✓";
+        button.textContent = "PDF Downloaded ✓";
 
-        setTimeout(()=>{
-          button.textContent=originalText;
-          button.disabled=false;
-        },2200);
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.disabled = false;
+        }, 2200);
 
-      }catch(error){
-        console.error("TOF PDF export error:",error);
+      } catch (error) {
+        console.error("TOF PDF export error:", error);
 
-        button.disabled=false;
-        button.textContent=originalText;
+        button.textContent = originalText;
+        button.disabled = false;
 
         alert(
-          "The PDF could not be generated. Please refresh the page and try again. If it still fails, check that your browser is connected to the internet because html2pdf.js is loaded from a CDN."
+          "The PDF could not be generated. Please refresh the page and try again."
         );
 
-      }finally{
-        $("pdfReport").style.display="none";
+      } finally {
+        document.body.classList.remove("pdf-exporting");
+        report.style.display = "none";
+        report.style.visibility = "hidden";
+        report.style.opacity = "0";
       }
     }
 
