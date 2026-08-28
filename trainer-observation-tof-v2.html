@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.2.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
@@ -309,6 +309,141 @@
       .rating-group{justify-content:flex-start}
       .comment-box textarea{min-height:78px}
       .result-hero{grid-template-columns:1fr}
+    }
+
+    /* PDF EXPORT STYLES */
+    .pdf-export {
+      display:block !important;
+      width:100% !important;
+      max-width:794px !important;
+      margin:0 !important;
+      padding:24px !important;
+      background:#ffffff !important;
+      color:#172522 !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+    }
+
+    .pdf-export .panel,
+    .pdf-export .summary-card,
+    .pdf-export .profile,
+    .pdf-export .comment-card,
+    .pdf-export .action-plan,
+    .pdf-export .overall-comments {
+      background:#ffffff !important;
+      color:#172522 !important;
+      box-shadow:none !important;
+      border-color:#d8e0dd !important;
+    }
+
+    .pdf-export h1,
+    .pdf-export h2,
+    .pdf-export h3,
+    .pdf-export .criterion-name,
+    .pdf-export .bar-score,
+    .pdf-export .gauge-inner strong {
+      color:#172522 !important;
+    }
+
+    .pdf-export p,
+    .pdf-export .summary-text,
+    .pdf-export .bar-name,
+    .pdf-export .criterion-help {
+      color:#5e6f6a !important;
+    }
+
+    .pdf-header {
+      padding:0 0 18px;
+      margin:0 0 22px;
+      border-bottom:2px solid #168c7b;
+    }
+
+    .pdf-brand {
+      color:#168c7b;
+      font:700 10px "IBM Plex Mono",monospace;
+      letter-spacing:.14em;
+    }
+
+    .pdf-title {
+      color:#172522;
+      font:700 27px Fraunces,Georgia,serif;
+      letter-spacing:-.03em;
+      margin-top:6px;
+    }
+
+    .pdf-subtitle {
+      color:#6a7975;
+      font-size:10px;
+      margin-top:3px;
+    }
+
+    .pdf-export .result-hero {
+      grid-template-columns:190px 1fr;
+      background:#f7faf9 !important;
+      border-color:#d8e0dd !important;
+    }
+
+    .pdf-export .gauge {
+      width:160px;
+      height:160px;
+      background:conic-gradient(#168c7b var(--deg),#dde6e2 0) !important;
+    }
+
+    .pdf-export .gauge::after {
+      background:#ffffff !important;
+      border-color:#d8e0dd !important;
+    }
+
+    .pdf-export .gauge-inner strong {
+      font-size:31px;
+    }
+
+    .pdf-export .summary-grid,
+    .pdf-export .comment-grid {
+      grid-template-columns:1fr 1fr;
+    }
+
+    .pdf-export .bar-fill {
+      background:#168c7b !important;
+    }
+
+    .pdf-export .rating-pill {
+      color:#168c7b !important;
+      border-color:#9ed4ca !important;
+      background:#edf8f5 !important;
+    }
+
+    .pdf-field-value {
+      min-height:60px;
+      padding:12px 14px;
+      border:1px solid #d8e0dd;
+      border-radius:10px;
+      color:#263632;
+      background:#fbfcfc;
+      white-space:pre-wrap;
+      font-size:11px;
+      line-height:1.55;
+    }
+
+    .pdf-footer-note {
+      margin-top:24px;
+      padding-top:10px;
+      border-top:1px solid #d8e0dd;
+      color:#7a8884;
+      font:8px "IBM Plex Mono",monospace;
+    }
+
+    .pdf-export .mini,
+    .pdf-export .eyebrow {
+      color:#168c7b !important;
+    }
+
+    .pdf-export .section {
+      page-break-inside:avoid;
+    }
+
+    .pdf-export .criterion {
+      page-break-inside:avoid;
     }
 
     @media(max-width:700px){
@@ -898,243 +1033,100 @@
       return 48;
     }
 
-    function exportPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit:"pt", format:"a4" });
+    async function exportPDF() {
+      if (!lastResult) {
+        alert("Please generate the observation report before exporting the PDF.");
+        return;
+      }
 
-      const r = getOverallResult();
-      const sectionResults = sections.map(getSectionResult);
-      const rating = getRating(r.score);
+      if (typeof html2pdf === "undefined") {
+        alert("PDF export library could not be loaded. Please check your internet connection and refresh the page.");
+        return;
+      }
 
-      const margin = 42;
-      const width = 595.28;
-      const height = 841.89;
-      const contentWidth = width - margin * 2;
+      saveComments();
 
-      const dark = [28, 43, 39];
-      const teal = [24, 139, 123];
-      const muted = [99, 115, 110];
-      const line = [218, 226, 222];
-      const pale = [244, 249, 247];
-      const amber = [207, 139, 29];
-      const red = [195, 83, 83];
+      const source = $("results");
+      const clone = source.cloneNode(true);
 
-      let y = 44;
+      clone.removeAttribute("id");
+      clone.classList.remove("hidden");
+      clone.classList.add("pdf-export");
 
-      doc.setFillColor(250,252,251);
-      doc.rect(0,0,width,height,"F");
+      /* Remove interactive controls from the PDF copy. */
+      clone.querySelectorAll("button, .footer-actions, #themeToggle").forEach(el => el.remove());
 
-      doc.setTextColor(...teal);
-      doc.setFont("courier","bold");
-      doc.setFontSize(9);
-      doc.text("GG LEARNLABS", margin, y);
-
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(21);
-      doc.setTextColor(...dark);
-      doc.text("TRAINER OBSERVATION FORM", margin, y + 27);
-
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(8);
-      doc.setTextColor(...muted);
-      doc.text(
-        `Observation Date: ${$("observationDate").value ? formatDate($("observationDate").value) : "—"}`,
-        width - margin, y,
-        {align:"right"}
-      );
-
-      y += 66;
-
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(16);
-      doc.setTextColor(...dark);
-      doc.text(
-        escapePdf($("classTopic").value.trim() || "Trainer Observation"),
-        margin,
-        y
-      );
-
-      y += 22;
-
-      const meta = [
-        `Trainer: ${$("trainerName").value.trim() || "—"}`,
-        `Evaluator: ${$("evaluatorName").value.trim() || "—"}`,
-        $("observationTime").value ? `Time: ${$("observationTime").value}` : "",
-        $("courseDuration").value ? `Duration: ${$("courseDuration").value} mins` : ""
-      ].filter(Boolean).join("   |   ");
-
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(...muted);
-      doc.text(escapePdf(meta), margin, y);
-
-      y += 28;
-
-      doc.setFillColor(...pale);
-      doc.setDrawColor(...line);
-      doc.roundedRect(margin,y,contentWidth,92,10,10,"FD");
-
-      doc.setTextColor(...teal);
-      doc.setFont("courier","bold");
-      doc.setFontSize(8);
-      doc.text("OVERALL SCORE", margin + 18, y + 22);
-
-      doc.setTextColor(...dark);
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(29);
-      doc.text(`${r.score.toFixed(1)}%`, margin + 18, y + 60);
-
-      const rc =
-        rating.label === "CRITICAL"
-          ? red
-          : rating.label === "NEEDS IMPROVEMENT"
-          ? amber
-          : teal;
-
-      doc.setFillColor(...rc);
-      doc.roundedRect(width - margin - 155, y + 20, 137, 28, 14, 14, "F");
-      doc.setTextColor(255,255,255);
-      doc.setFontSize(8);
-      doc.text(rating.label, width - margin - 86, y + 38, {align:"center"});
-
-      y += 120;
-
-      doc.setTextColor(...dark);
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(13);
-      doc.text("Section Scores", margin, y);
-      y += 20;
-
-      sectionResults.forEach(section => {
-        if (y > height - 90) y = addPdfPage(doc);
-
-        doc.setFont("helvetica","normal");
-        doc.setFontSize(8.3);
-        doc.setTextColor(...dark);
-
-        const label = escapePdf(section.name);
-        doc.text(label, margin, y);
-
-        doc.setFillColor(226,233,230);
-        doc.roundedRect(margin + 190, y - 7, 220, 6, 3, 3, "F");
-
-        if (section.score !== null) {
-          doc.setFillColor(...teal);
-          doc.roundedRect(
-            margin + 190, y - 7,
-            220 * (section.score / 100),
-            6, 3, 3, "F"
-          );
-        }
-
-        doc.text(
-          section.score === null ? "N/A" : `${section.score.toFixed(1)}%`,
-          width - margin,
-          y,
-          {align:"right"}
-        );
-
-        y += 20;
+      /* Keep the editable text fields but render their values as visible text. */
+      clone.querySelectorAll("textarea").forEach(textarea => {
+        const replacement = document.createElement("div");
+        replacement.className = "pdf-field-value";
+        replacement.textContent = textarea.value.trim() || "—";
+        textarea.replaceWith(replacement);
       });
 
-      y += 14;
+      /* Add a clean PDF-only heading. */
+      const pdfHeader = document.createElement("div");
+      pdfHeader.className = "pdf-header";
+      pdfHeader.innerHTML = `
+        <div class="pdf-brand">GG LEARNLABS</div>
+        <div class="pdf-title">TRAINER OBSERVATION FORM</div>
+        <div class="pdf-subtitle">Observation Report</div>
+      `;
+      clone.insertBefore(pdfHeader, clone.firstChild);
 
-      if (y > height - 220) y = addPdfPage(doc);
+      const pdfFooter = document.createElement("div");
+      pdfFooter.className = "pdf-footer-note";
+      pdfFooter.textContent = "GG LearnLabs · Trainer Observation Form · Y/N/N/A scoring · N/A excluded from denominator";
+      clone.appendChild(pdfFooter);
 
-      const strongest = [...sectionResults].filter(s => s.score !== null).sort((a,b)=>b.score-a.score)[0];
-      const weakest = [...sectionResults].filter(s => s.score !== null).sort((a,b)=>a.score-b.score)[0];
+      const holder = document.createElement("div");
+      holder.style.position = "fixed";
+      holder.style.left = "-100000px";
+      holder.style.top = "0";
+      holder.style.width = "794px";
+      holder.style.background = "#ffffff";
+      holder.style.zIndex = "-1";
+      holder.appendChild(clone);
+      document.body.appendChild(holder);
 
-      if (strongest && weakest) {
-        doc.setFillColor(239,249,246);
-        doc.roundedRect(margin,y,(contentWidth-12)/2,64,9,9,"F");
-        doc.setTextColor(...teal);
-        doc.setFont("courier","bold");
-        doc.setFontSize(7.5);
-        doc.text("STRONGEST SECTION",margin+14,y+19);
-        doc.setTextColor(...dark);
-        doc.setFont("helvetica","bold");
-        doc.setFontSize(10);
-        doc.text(escapePdf(strongest.name),margin+14,y+40);
-        doc.text(`${strongest.score.toFixed(1)}%`,margin+(contentWidth-12)/2-14,y+40,{align:"right"});
+      try {
+        const fileName = `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`;
 
-        const x2 = margin + (contentWidth-12)/2 + 12;
+        const options = {
+          margin: [10, 10, 12, 10],
+          filename: fileName,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+            scrollX: 0,
+            scrollY: 0
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+            compress: true
+          },
+          pagebreak: {
+            mode: ["css", "legacy"]
+          }
+        };
 
-        doc.setFillColor(255,248,239);
-        doc.roundedRect(x2,y,(contentWidth-12)/2,64,9,9,"F");
-        doc.setTextColor(...amber);
-        doc.setFont("courier","bold");
-        doc.setFontSize(7.5);
-        doc.text("DEVELOPMENT PRIORITY",x2+14,y+19);
-        doc.setTextColor(...dark);
-        doc.setFont("helvetica","bold");
-        doc.setFontSize(10);
-        doc.text(escapePdf(weakest.name),x2+14,y+40);
-        doc.text(`${weakest.score.toFixed(1)}%`,width-margin-14,y+40,{align:"right"});
+        await html2pdf()
+          .set(options)
+          .from(clone)
+          .save();
 
-        y += 84;
+      } catch (error) {
+        console.error("TOF PDF export failed:", error);
+        alert("The PDF could not be generated. Please try again.");
+      } finally {
+        holder.remove();
       }
-
-      const coach = getCoachingRecommendation(weakest || sectionResults[0] || {id:"",name:""});
-      doc.setTextColor(...teal);
-      doc.setFont("courier","bold");
-      doc.setFontSize(8);
-      doc.text("COACHING RECOMMENDATION",margin,y);
-      y += 17;
-
-      doc.setTextColor(...dark);
-      doc.setFont("helvetica","bold");
-      doc.setFontSize(11);
-      doc.text(escapePdf(coach[0]),margin,y);
-      y += 16;
-
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(8.8);
-      const coachLines = doc.splitTextToSize(escapePdf(coach[1]),contentWidth);
-      doc.text(coachLines,margin,y);
-      y += coachLines.length * 12 + 14;
-
-      const optionalFields = [
-        ["Strength Evidence / Comments",$("strengthComments").value.trim()],
-        ["Development Evidence / Comments",$("developmentComments").value.trim()],
-        ["Recommended Action",$("actionPlan").value.trim()],
-        ["Follow-up / Success Measure",$("successMeasure").value.trim()],
-        ["Final Observer Comments",$("overallComments").value.trim()]
-      ];
-
-      for (const [title,text] of optionalFields) {
-        if (!text) continue;
-
-        if (y > height - 120) y = addPdfPage(doc);
-
-        doc.setTextColor(...teal);
-        doc.setFont("courier","bold");
-        doc.setFontSize(7.5);
-        doc.text(title.toUpperCase(),margin,y);
-        y += 14;
-
-        doc.setTextColor(...dark);
-        doc.setFont("helvetica","normal");
-        doc.setFontSize(8.5);
-        const lines = doc.splitTextToSize(escapePdf(text),contentWidth);
-        doc.text(lines,margin,y);
-        y += lines.length * 11 + 14;
-      }
-
-      doc.setDrawColor(...line);
-      doc.line(margin,height-38,width-margin,height-38);
-
-      doc.setFont("helvetica","normal");
-      doc.setFontSize(7);
-      doc.setTextColor(...muted);
-      doc.text(
-        "GG LearnLabs · Trainer Observation Form · Y/N/N/A scoring; N/A excluded from denominator",
-        margin,
-        height - 22
-      );
-
-      doc.save(
-        `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`
-      );
     }
 
     function safeFileName(value) {
