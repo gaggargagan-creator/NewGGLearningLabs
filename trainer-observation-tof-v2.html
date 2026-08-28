@@ -194,7 +194,8 @@
 
     /* =========================================================
        ONE-PAGE PDF REPORT
-       Fixed A4-proportional capture area: 794 x 1123 CSS px.
+       Fixed A4 ratio: 794 x 1123 CSS px
+       Designed as an executive L&D infographic.
     ========================================================= */
 
     #pdfReport{
@@ -210,11 +211,6 @@
       font-family:Arial,Helvetica,sans-serif;
     }
 
-    body.pdf-exporting{
-      background:#fff !important;
-      overflow:hidden !important;
-    }
-
     body.pdf-exporting > .page,
     body.pdf-exporting > .grid{
       display:none !important;
@@ -222,8 +218,6 @@
 
     body.pdf-exporting > #pdfReport{
       display:block !important;
-      visibility:visible !important;
-      opacity:1 !important;
     }
 
     .pdf-onepage{
@@ -232,7 +226,6 @@
       padding:34px 36px 28px;
       display:flex;
       flex-direction:column;
-      overflow:hidden;
       background:
         radial-gradient(circle at 8% 0%,#e8f6f2,transparent 25%),
         radial-gradient(circle at 98% 8%,#fff2dd,transparent 23%),
@@ -361,6 +354,7 @@
       margin-top:11px;
       padding:5px 9px;
       border-radius:999px;
+      background:#55dfc7;
       color:#06201c;
       font:bold 8px Arial,sans-serif;
       letter-spacing:.8px;
@@ -779,7 +773,7 @@
 
       <div class="footer-actions">
         <button class="btn" id="editButton" type="button">← Edit Observation</button>
-        <button class="btn btn-primary" id="exportButton" type="button">Export TOF Report as PDF ↓</button>
+        <button class="btn btn-primary" id="exportButton" type="button" title="Generate and download a one-page PDF">Export TOF Report as PDF ↓</button>
       </div>
     </section>
 
@@ -1097,41 +1091,39 @@
 
       const sectionBars = resultSections.map(section => `
         <div class="pdf-bar-item">
-          <div class="pdf-bar-name">${esc(section.name.replace(/^[0-9.]+\s*/, ""))}</div>
+          <div class="pdf-bar-name">${esc(section.name.replace(/^[0-9.]+\\s*/, ""))}</div>
           <div class="pdf-bar-track">
-            <div class="pdf-bar-fill"
-                 style="width:${section.score === null ? 0 : section.score}%;
-                        background:${section.score !== null && section.score < 70 ? "#c75a5a" : section.score !== null && section.score < 85 ? "#c98518" : "#178f7f"}"></div>
+            <div class="pdf-bar-fill" style="width:${section.score === null ? 0 : section.score}%;background:${section.score !== null && section.score < 70 ? "#c75a5a" : section.score !== null && section.score < 85 ? "#c98518" : "#178f7f"}"></div>
           </div>
           <div class="pdf-bar-value">${section.score === null ? "N/A" : section.score.toFixed(1) + "%"}</div>
         </div>
       `).join("");
 
-      const strengths = resultSections
-        .filter(s=>s.score!==null && s.score>=90)
+      const strengthItems = resultSections
+        .filter(s => s.score !== null && s.score >= 90)
         .sort((a,b)=>b.score-a.score)
         .slice(0,3);
 
-      const development = resultSections
-        .filter(s=>s.score!==null && s.score<85)
+      const developmentItems = resultSections
+        .filter(s => s.score !== null && s.score < 85)
         .sort((a,b)=>a.score-b.score)
         .slice(0,3);
 
-      const strengthList = strengths.length
-        ? strengths.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+      const strengthList = strengthItems.length
+        ? strengthItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
         : "<li>No section crossed the 90% strength threshold.</li>";
 
-      const developmentList = development.length
-        ? development.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+      const developmentList = developmentItems.length
+        ? developmentItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
         : "<li>No section is below the 85% development threshold.</li>";
 
       const notes = [
         ["Strength Evidence", $("strengthComments").value.trim()],
         ["Development Evidence", $("developmentComments").value.trim()],
         ["Final Observer Comments", $("overallComments").value.trim()]
-      ].filter(([,text])=>text);
+      ].filter(([,text]) => text);
 
-      const noteBlocks = notes.slice(0,3).map(([title,text])=>`
+      const noteBlocks = notes.slice(0,3).map(([title,text]) => `
         <div class="pdf-note">
           <div class="pdf-note-title">${esc(title)}</div>
           <div class="pdf-note-text">${esc(text).replace(/\n/g,"<br>")}</div>
@@ -1140,6 +1132,7 @@
 
       $("pdfReport").innerHTML = `
         <div class="pdf-onepage">
+
           <div class="pdf-header">
             <div class="pdf-brand">
               <img src="logo.png" alt="GG LearnLabs">
@@ -1148,6 +1141,7 @@
                 <div class="pdf-title">Trainer Observation Report</div>
               </div>
             </div>
+
             <div class="pdf-date">
               <strong>${esc($("observationDate").value ? formatDate($("observationDate").value) : "Observation")}</strong><br>
               ${$("observationTime").value ? esc($("observationTime").value) + " · " : ""}
@@ -1156,10 +1150,22 @@
           </div>
 
           <div class="pdf-meta-strip">
-            <div class="pdf-meta-box"><div class="pdf-meta-label">Trainer</div><div class="pdf-meta-value">${esc($("trainerName").value.trim()||"—")}</div></div>
-            <div class="pdf-meta-box"><div class="pdf-meta-label">Evaluator</div><div class="pdf-meta-value">${esc($("evaluatorName").value.trim()||"—")}</div></div>
-            <div class="pdf-meta-box"><div class="pdf-meta-label">Class / Topic</div><div class="pdf-meta-value">${esc($("classTopic").value.trim()||"—")}</div></div>
-            <div class="pdf-meta-box"><div class="pdf-meta-label">Criteria</div><div class="pdf-meta-value">36 observation points</div></div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Trainer</div>
+              <div class="pdf-meta-value">${esc($("trainerName").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Evaluator</div>
+              <div class="pdf-meta-value">${esc($("evaluatorName").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Class / Topic</div>
+              <div class="pdf-meta-value">${esc($("classTopic").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Criteria</div>
+              <div class="pdf-meta-value">36 observation points</div>
+            </div>
           </div>
 
           <div class="pdf-hero">
@@ -1174,10 +1180,20 @@
               <div class="pdf-summary-label">Executive Readout</div>
               <div class="pdf-summary-title">${esc(rating.title)}</div>
               <div class="pdf-summary-text">${esc(rating.text)}</div>
+
               <div class="pdf-stat-row">
-                <div class="pdf-stat"><div class="pdf-stat-value">${strongCount}/7</div><div class="pdf-stat-label">Strong Sections</div></div>
-                <div class="pdf-stat"><div class="pdf-stat-value">${focusCount}</div><div class="pdf-stat-label">Focus Sections</div></div>
-                <div class="pdf-stat"><div class="pdf-stat-value">${overall.denominator ? ((overall.yes/overall.denominator)*100).toFixed(0) : 0}%</div><div class="pdf-stat-label">Applicable Y Rate</div></div>
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${strongCount}/7</div>
+                  <div class="pdf-stat-label">Strong Sections</div>
+                </div>
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${focusCount}</div>
+                  <div class="pdf-stat-label">Focus Sections</div>
+                </div>
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${overall.denominator ? ((overall.yes/overall.denominator)*100).toFixed(0) : 0}%</div>
+                  <div class="pdf-stat-label">Applicable Y Rate</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1192,14 +1208,14 @@
           <div class="pdf-insight-grid">
             <div class="pdf-insight green">
               <div class="pdf-insight-label">Strongest Section</div>
-              <div class="pdf-insight-title">${esc((strongest?.name||"—").replace(/^[0-9.]+\s*/,""))}</div>
-              <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1)+"%" : "—"}</div>
+              <div class="pdf-insight-title">${esc((strongest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1) + "%" : "—"}</div>
             </div>
 
             <div class="pdf-insight amber">
               <div class="pdf-insight-label">Development Priority</div>
-              <div class="pdf-insight-title">${esc((weakest?.name||"—").replace(/^[0-9.]+\s*/,""))}</div>
-              <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1)+"%" : "—"}</div>
+              <div class="pdf-insight-title">${esc((weakest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1) + "%" : "—"}</div>
             </div>
 
             <div class="pdf-insight blue">
@@ -1214,6 +1230,7 @@
               <div class="pdf-box-title">Observed Strengths</div>
               <ul class="pdf-list">${strengthList}</ul>
             </div>
+
             <div class="pdf-box">
               <div class="pdf-box-title">Development Focus</div>
               <ul class="pdf-list">${developmentList}</ul>
@@ -1232,6 +1249,7 @@
             <span>GG LearnLabs · Trainer Observation Form</span>
             <span>Y = positive · N = negative · N/A = excluded</span>
           </div>
+
         </div>
       `;
     }
@@ -1242,33 +1260,33 @@
       }
 
       const sources = [
-        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
-        "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+        "https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
       ];
 
       for(const source of sources){
-        const ok = await new Promise(resolve=>{
+        const loaded = await new Promise(resolve => {
           const script = document.createElement("script");
           script.src = source;
           script.async = true;
 
-          let done = false;
+          let settled = false;
 
-          const finish = value=>{
-            if(done) return;
-            done = true;
+          const finish = value => {
+            if(settled) return;
+            settled = true;
             resolve(value);
           };
 
-          script.onload = ()=>finish(true);
-          script.onerror = ()=>finish(false);
+          script.onload = () => finish(true);
+          script.onerror = () => finish(false);
 
           document.head.appendChild(script);
 
-          setTimeout(()=>finish(false),10000);
+          setTimeout(() => finish(false), 12000);
         });
 
-        if(ok && typeof window.html2pdf === "function"){
+        if(loaded && typeof window.html2pdf === "function"){
           return true;
         }
       }
@@ -1287,24 +1305,25 @@
 
         const loaded = await ensureHtml2Pdf();
 
-        if(!loaded){
+        if(!loaded || typeof window.html2pdf !== "function"){
           throw new Error("html2pdf.js failed to load.");
         }
 
         buildPdfReport();
 
         /*
-          Critical: render the report as a real, visible DOM element while
-          capturing it. Do not use display:none, opacity:0 or off-screen
-          positioning during html2canvas capture.
+          html2canvas must be able to see the report. Keep the report in normal
+          document flow and temporarily hide the application UI.
         */
         document.body.classList.add("pdf-exporting");
         report.style.display = "block";
 
-        await new Promise(resolve=>setTimeout(resolve,250));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         if(document.fonts && document.fonts.ready){
-          try{ await document.fonts.ready; }catch(_){}
+          try{
+            await document.fonts.ready;
+          }catch(_){}
         }
 
         await new Promise(resolve =>
@@ -1316,50 +1335,68 @@
         const filename =
           `${safeFileName($("trainerName").value || "trainer")}_TOF_one-page_${safeFileName($("classTopic").value || "observation")}.pdf`;
 
-        const options = {
-          margin: 0,
-          filename,
-          image:{
-            type:"jpeg",
-            quality:0.98
-          },
-          html2canvas:{
-            scale:2,
-            useCORS:true,
-            allowTaint:false,
-            backgroundColor:"#f8fbfa",
-            logging:false,
-            scrollX:0,
-            scrollY:0,
-            width:794,
-            height:1123,
-            windowWidth:794,
-            windowHeight:1123
-          },
-          jsPDF:{
-            unit:"mm",
-            format:"a4",
-            orientation:"portrait",
-            compress:true
-          }
-        };
+        const worker = window.html2pdf()
+          .set({
+            margin: 0,
+            filename,
+            image:{
+              type:"jpeg",
+              quality:0.98
+            },
+            html2canvas:{
+              scale:2,
+              useCORS:true,
+              allowTaint:false,
+              backgroundColor:"#f8fbfa",
+              logging:true,
+              scrollX:0,
+              scrollY:0,
+              width:794,
+              height:1123,
+              windowWidth:794,
+              windowHeight:1123
+            },
+            jsPDF:{
+              unit:"mm",
+              format:"a4",
+              orientation:"portrait",
+              compress:true
+            }
+          })
+          .from(report);
 
         /*
-          Direct worker chain:
-          this avoids get()/then()/deletePage() combinations that can break
-          html2pdf's Worker chain in some browser versions.
+          Generate the PDF as a Blob first, then trigger the browser download
+          ourselves. This separates PDF generation from the library's save()
+          helper and gives us a real Blob to validate.
         */
-        await window.html2pdf()
-          .set(options)
-          .from(report)
-          .save();
+        const pdfBlob = await worker.outputPdf("blob");
 
-        button.textContent = "PDF Downloaded ✓";
+        if(!pdfBlob || pdfBlob.size < 1000){
+          throw new Error("PDF blob was empty or invalid.");
+        }
 
-        setTimeout(()=>{
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        const downloadLink = document.createElement("a");
+
+        downloadLink.href = blobUrl;
+        downloadLink.download = filename;
+        downloadLink.style.display = "none";
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        setTimeout(() => {
+          downloadLink.remove();
+          URL.revokeObjectURL(blobUrl);
+        }, 1000);
+
+        button.textContent = "1-page PDF Downloaded ✓";
+
+        setTimeout(() => {
           button.textContent = originalText;
           button.disabled = false;
-        },2200);
+        }, 2200);
 
       }catch(error){
         console.error("TOF PDF export error:",error);
@@ -1368,7 +1405,7 @@
         button.disabled = false;
 
         alert(
-          "The PDF could not be generated. Please refresh the page and try again."
+          "PDF export failed. Please refresh the page and try again. Check the browser console for the exact export error."
         );
 
       }finally{
