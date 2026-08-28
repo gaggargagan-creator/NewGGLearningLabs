@@ -34,29 +34,65 @@
 
   <header class="topbar">
 
-    <div class="topbar-left">
+  <div class="topbar-left">
 
-      <button
-        type="button"
-        class="header-back hidden"
-        id="headerBack"
-        aria-label="Go back"
-      >
-        ← Back
-      </button>
+    <button
+      type="button"
+      class="header-back hidden"
+      id="headerBack"
+      aria-label="Go back"
+    >
+      ← Back
+    </button>
 
-      <a href="#" class="brand brand-logo" id="brandHome" aria-label="Go to home">
-      <img src="logo.png" alt="GG LearnLabs">
-      </a>
+    <a
+      href="#"
+      class="brand"
+      id="brandHome"
+      aria-label="GG LearnLabs Home"
+    >
+      <span class="logo-wrap">
+        <img
+          src="logo.png"
+          alt="GG LearnLabs"
+          class="brand-logo"
+        >
+      </span>
+    </a>
 
-    </div>
+  </div>
 
-    <button class="ghost" id="howItWorks">
+
+  <div class="topbar-actions">
+
+    <button
+      type="button"
+      class="theme-toggle"
+      id="themeToggle"
+      aria-label="Switch between dark and light mode"
+      title="Switch theme"
+    >
+      <span class="theme-icon sun-icon">☀</span>
+
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+
+      <span class="theme-icon moon-icon">☾</span>
+    </button>
+
+
+    <button
+      class="ghost"
+      id="howItWorks"
+      type="button"
+    >
       How it works
     </button>
 
-  </header>
+  </div>
 
+</header>
 
   <main class="shell">
 
