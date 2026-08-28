@@ -66,93 +66,95 @@
       </div>
 
 
-      <section class="gx-tool-directory" aria-labelledby="gxToolDirectoryTitle">
-        <div class="gx-tool-directory-head">
+      <section class="gl-tool-directory" aria-labelledby="glToolDirectoryTitle">
+        <div class="gl-tool-directory-head">
           <div>
-            <div class="gx-tool-directory-kicker">L&amp;D TOOLKIT</div>
-            <h2 class="gx-tool-directory-title" id="gxToolDirectoryTitle">Choose your instrument.</h2>
+            <div class="gl-tool-directory-kicker">L&amp;D TOOLKIT</div>
+            <h2 class="gl-tool-directory-title" id="glToolDirectoryTitle">Choose your instrument.</h2>
           </div>
-          <p class="gx-tool-directory-copy">
+
+          <p class="gl-tool-directory-copy">
             Practical instruments for assessing training, observing delivery
             and turning learner feedback into useful L&amp;D decisions.
           </p>
         </div>
 
-        <div class="gx-tool-grid">
+        <div class="gl-tool-grid">
 
           <button
             type="button"
-            class="gx-tool-card gx-tool-card-featured"
-            id="gxTrainingEffectiveness"
+            class="gl-tool-card gl-tool-card-featured"
+            id="glTrainingEffectiveness"
             aria-label="Open Training Effectiveness Assessment"
           >
-            <div class="gx-tool-top">
-              <div class="gx-tool-kicker">
-                <span class="gx-tool-number">01</span>
+            <div class="gl-tool-top">
+              <div class="gl-tool-kicker">
+                <span class="gl-tool-number">01</span>
                 Measure
               </div>
-              <span class="gx-tool-status">Live</span>
+              <span class="gl-tool-status">Live</span>
             </div>
 
             <h3>Training Effectiveness Assessment</h3>
 
             <p>
               Assess a training program across five weighted measures,
-              identify gaps and generate a practical effectiveness readout.
+              calculate the overall effectiveness score and identify
+              the areas that need attention.
             </p>
 
-            <div class="gx-tool-tags">
-              <span class="gx-tool-tag">5 measures</span>
-              <span class="gx-tool-tag">Weighted score</span>
-              <span class="gx-tool-tag">PDF report</span>
+            <div class="gl-tool-tags">
+              <span class="gl-tool-tag">5 measures</span>
+              <span class="gl-tool-tag">Weighted score</span>
+              <span class="gl-tool-tag">PDF report</span>
             </div>
 
-            <div class="gx-tool-open">Open assessment →</div>
+            <div class="gl-tool-open">Open assessment →</div>
           </button>
-
 
           <a
             href="trainer-observation-tof-v2.html"
-            class="gx-tool-card"
-            id="gxTrainerObservation"
+            class="gl-tool-card"
+            id="glTrainerObservation"
             aria-label="Open Trainer Observation and Feedback"
           >
-            <div class="gx-tool-top">
-              <div class="gx-tool-kicker">
-                <span class="gx-tool-number">02</span>
+            <div class="gl-tool-top">
+              <div class="gl-tool-kicker">
+                <span class="gl-tool-number">02</span>
                 Observe
               </div>
-              <span class="gx-tool-status">Live</span>
+              <span class="gl-tool-status">Live</span>
             </div>
 
             <h3>Trainer Observation &amp; Feedback</h3>
 
             <p>
-              Evaluate trainer performance using the real TOF framework:
-              36 criteria across seven sections with Y / N / N/A scoring.
+              Evaluate trainer performance using the actual TOF framework,
+              with 36 observation criteria across seven sections and
+              Y / N / N/A scoring.
             </p>
 
-            <div class="gx-tool-tags">
-              <span class="gx-tool-tag">36 criteria</span>
-              <span class="gx-tool-tag">Y / N / N/A</span>
-              <span class="gx-tool-tag">1-page PDF</span>
+            <div class="gl-tool-tags">
+              <span class="gl-tool-tag">36 criteria</span>
+              <span class="gl-tool-tag">Y / N / N/A</span>
+              <span class="gl-tool-tag">1-page PDF</span>
             </div>
 
-            <div class="gx-tool-open">Open observation tool →</div>
+            <div class="gl-tool-open">Open observation tool →</div>
           </a>
 
           <a
             href="l1-feedback-analyzer.html"
-            class="gx-tool-card"
-            id="gxL1Feedback"
+            class="gl-tool-card"
+            id="glL1Feedback"
             aria-label="Open L1 Feedback Analyzer"
           >
-            <div class="gx-tool-top">
-              <div class="gx-tool-kicker">
-                <span class="gx-tool-number">03</span>
+            <div class="gl-tool-top">
+              <div class="gl-tool-kicker">
+                <span class="gl-tool-number">03</span>
                 Listen
               </div>
-              <span class="gx-tool-status">Live</span>
+              <span class="gl-tool-status">Live</span>
             </div>
 
             <h3>L1 Feedback Analyzer</h3>
@@ -163,19 +165,19 @@
               learner signals.
             </p>
 
-            <div class="gx-tool-tags">
-              <span class="gx-tool-tag">Any question count</span>
-              <span class="gx-tool-tag">Excel / CSV</span>
-              <span class="gx-tool-tag">1-page PDF</span>
+            <div class="gl-tool-tags">
+              <span class="gl-tool-tag">Any question count</span>
+              <span class="gl-tool-tag">Excel / CSV</span>
+              <span class="gl-tool-tag">1-page PDF</span>
             </div>
 
-            <div class="gx-tool-open">Open feedback analyzer →</div>
+            <div class="gl-tool-open">Open feedback analyzer →</div>
           </a>
 
         </div>
       </section>
 
-    </section>
+</section>
 
     <section id="assessment" class="hidden">
       <div class="progress-wrap">
@@ -377,6 +379,20 @@
       }
     })();
   </script>
+
+
+<script id="gl-tool-directory-hook">
+(function(){
+  const card = document.getElementById("glTrainingEffectiveness");
+  const start = document.getElementById("startAssessment");
+
+  if(card && start){
+    card.addEventListener("click",function(){
+      start.click();
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
