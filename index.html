@@ -2,45 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GG LearnLabs | Training Effectiveness</title>
-  <meta name="description" content="Assess training effectiveness using weighted L&D measures.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>GG LearnLabs | Training Effectiveness</title>
+
+  <meta
+    name="description"
+    content="Assess training effectiveness using weighted L&D measures."
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 </head>
 
 <body>
+
   <div class="grid"></div>
 
+  <!-- HEADER -->
   <header class="topbar">
+
     <div class="topbar-left">
-      <button type="button" class="header-back hidden" id="headerBack" aria-label="Go back">← Back</button>
 
-      <a href="#" class="brand brand-logo" id="brandHome" aria-label="Go to home">
-        <img src="logo.png" alt="GG LearnLabs">
-      </a>
-    </div>
-
-    <div class="topbar-actions">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false" title="Toggle light / dark mode">
-        <span class="theme-icon sun-icon" aria-hidden="true">☀</span>
-        <span class="theme-switch" aria-hidden="true"><span class="theme-thumb"></span></span>
-        <span class="theme-icon moon-icon" aria-hidden="true">☾</span>
+      <button
+        type="button"
+        class="header-back hidden"
+        id="headerBack"
+        aria-label="Go back"
+      >
+        ← Back
       </button>
 
-      <button type="button" class="ghost" id="howItWorks">How it works</button>
+      <a
+        href="#"
+        class="brand brand-logo"
+        id="brandHome"
+        aria-label="Go to home"
+      >
+        <img
+          src="logo.png"
+          alt="GG LearnLabs"
+        >
+      </a>
+
     </div>
+
+
+    <div class="topbar-actions">
+
+      <!-- DARK / LIGHT MODE -->
+      <button
+        type="button"
+        class="theme-toggle"
+        id="themeToggle"
+        aria-label="Switch to light mode"
+        aria-pressed="false"
+        title="Toggle light / dark mode"
+      >
+
+        <span
+          class="theme-icon sun-icon"
+          aria-hidden="true"
+        >
+          ☀
+        </span>
+
+        <span
+          class="theme-switch"
+          aria-hidden="true"
+        >
+          <span class="theme-thumb"></span>
+        </span>
+
+        <span
+          class="theme-icon moon-icon"
+          aria-hidden="true"
+        >
+          ☾
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="ghost"
+        id="howItWorks"
+      >
+        How it works
+      </button>
+
+    </div>
+
   </header>
+
 
   <main class="shell">
 
-    <section id="home" class="hero">
-      <div class="eyebrow">TRAINING EFFECTIVENESS WORKSPACE</div>
+    <!-- HOME -->
+
+    <section
+      id="home"
+      class="hero"
+    >
+
+      <div class="eyebrow">
+        TRAINING EFFECTIVENESS WORKSPACE
+      </div>
 
       <h1>
         Measure what happened.<br>
@@ -53,205 +145,614 @@
         a practical recommendation.
       </p>
 
-      <button class="primary" id="startAssessment">
-        Start Training Assessment <span>→</span>
+
+      <button
+        class="primary"
+        id="startAssessment"
+      >
+        Start Training Assessment
+        <span>→</span>
       </button>
 
+
       <div class="measure-preview">
-        <div><b>35%</b><span>Trainer</span></div>
-        <div><b>20%</b><span>Feedback</span></div>
-        <div><b>15%</b><span>Knowledge</span></div>
-        <div><b>20%</b><span>Application</span></div>
-        <div><b>10%</b><span>Completion</span></div>
+
+        <div>
+          <b>35%</b>
+          <span>Trainer</span>
+        </div>
+
+        <div>
+          <b>20%</b>
+          <span>Feedback</span>
+        </div>
+
+        <div>
+          <b>15%</b>
+          <span>Knowledge</span>
+        </div>
+
+        <div>
+          <b>20%</b>
+          <span>Application</span>
+        </div>
+
+        <div>
+          <b>10%</b>
+          <span>Completion</span>
+        </div>
+
       </div>
+
     </section>
 
-    <section id="assessment" class="hidden">
+
+    <!-- ASSESSMENT -->
+
+    <section
+      id="assessment"
+      class="hidden"
+    >
+
       <div class="progress-wrap">
+
         <div class="step-label">
-          <span id="stepNumber">01</span> / 02 — <span id="stepName">PROGRAM CONTEXT</span>
+          <span id="stepNumber">01</span>
+          /
+          02
+          —
+          <span id="stepName">
+            PROGRAM CONTEXT
+          </span>
         </div>
-        <div class="progress"><i id="progressBar"></i></div>
+
+        <div class="progress">
+          <i id="progressBar"></i>
+        </div>
+
       </div>
+
 
       <form id="assessmentForm">
-        <div id="step1" class="step active">
+
+
+        <!-- STEP 1 -->
+
+        <div
+          id="step1"
+          class="step active"
+        >
+
           <div class="section-intro">
-            <div class="eyebrow">PROGRAM CONTEXT</div>
-            <h2>What are we assessing?</h2>
-            <p>These details identify the assessment and appear in your final report.</p>
+
+            <div class="eyebrow">
+              PROGRAM CONTEXT
+            </div>
+
+            <h2>
+              What are we assessing?
+            </h2>
+
+            <p>
+              These details identify the assessment and appear in your final report.
+            </p>
+
           </div>
+
 
           <div class="form-grid">
+
             <label class="full">
+
               Training / Program Name
-              <input id="programName" placeholder="e.g. Leadership Development Program" required>
+
+              <input
+                id="programName"
+                placeholder="e.g. Leadership Development Program"
+                required
+              >
+
             </label>
 
+
             <label>
+
               Trainer Name
-              <input id="trainerName" placeholder="e.g. Nikita Tandi">
+
+              <input
+                id="trainerName"
+                placeholder="e.g. Nikita Tandi"
+              >
+
             </label>
 
+
             <label>
+
               Department / Business Unit
-              <input id="department" placeholder="e.g. Operations">
+
+              <input
+                id="department"
+                placeholder="e.g. Operations"
+              >
+
             </label>
 
+
             <label>
+
               Training Date
-              <input id="trainingDate" type="date">
+
+              <input
+                id="trainingDate"
+                type="date"
+              >
+
             </label>
 
+
             <label>
+
               Number of Participants
-              <input id="participants" type="number" min="1" placeholder="e.g. 25">
+
+              <input
+                id="participants"
+                type="number"
+                min="1"
+                placeholder="e.g. 25"
+              >
+
             </label>
+
           </div>
+
 
           <div class="actions right">
-            <button type="button" class="primary" id="toStep2">Continue <span>→</span></button>
+
+            <button
+              type="button"
+              class="primary"
+              id="toStep2"
+            >
+              Continue
+              <span>→</span>
+            </button>
+
           </div>
+
         </div>
 
-        <div id="step2" class="step">
+
+        <!-- STEP 2 -->
+
+        <div
+          id="step2"
+          class="step"
+        >
+
           <div class="section-intro">
-            <div class="eyebrow">EFFECTIVENESS MEASURES</div>
-            <h2>How did the training perform?</h2>
-            <p>Score each measure from 0 to 100. The weighted contribution is calculated automatically.</p>
+
+            <div class="eyebrow">
+              EFFECTIVENESS MEASURES
+            </div>
+
+            <h2>
+              How did the training perform?
+            </h2>
+
+            <p>
+              Score each measure from 0 to 100.
+              The weighted contribution is calculated automatically.
+            </p>
+
           </div>
 
-          <div id="measureCards" class="measure-cards"></div>
+
+          <div
+            id="measureCards"
+            class="measure-cards"
+          ></div>
+
 
           <div class="actions">
-            <button type="button" class="ghost" id="backToStep1">← Back</button>
-            <button type="submit" class="primary">Generate Assessment <span>→</span></button>
+
+            <button
+              type="button"
+              class="ghost"
+              id="backToStep1"
+            >
+              ← Back
+            </button>
+
+
+            <button
+              type="submit"
+              class="primary"
+            >
+              Generate Assessment
+              <span>→</span>
+            </button>
+
           </div>
+
         </div>
+
       </form>
+
     </section>
 
-    <section id="results" class="hidden">
+
+    <!-- RESULTS -->
+
+    <section
+      id="results"
+      class="hidden"
+    >
+
       <div class="results-head">
+
         <div>
-          <div class="eyebrow">TRAINING EFFECTIVENESS REPORT</div>
-          <h2 id="resultProgram">Your Assessment</h2>
-          <p id="resultMeta"></p>
-        </div>
 
-        <button class="ghost" id="newAssessment">New Assessment</button>
-      </div>
-
-      <div class="hero-result card">
-        <div class="gauge" id="gauge">
-          <div class="gauge-inner">
-            <strong id="overallScore">0.00</strong>
-            <span>% EFFECTIVENESS</span>
+          <div class="eyebrow">
+            TRAINING EFFECTIVENESS REPORT
           </div>
+
+          <h2 id="resultProgram">
+            Your Assessment
+          </h2>
+
+          <p id="resultMeta"></p>
+
         </div>
 
-        <div class="rating-copy">
-          <div id="ratingBadge" class="rating">SATISFACTORY</div>
-          <h3 id="ratingHeadline">A balanced result with room to improve.</h3>
-          <p id="ratingDescription"></p>
-          <div id="whyResult" class="why-result"></div>
-        </div>
-      </div>
 
-      <div class="metrics-grid" id="metricsGrid"></div>
-
-      <div class="insight-grid">
-        <article class="card insight strong-card">
-          <div class="mini-label">🏆 STRONGEST AREA</div>
-          <h3 id="strongestArea"></h3>
-          <div class="big-score" id="strongestScore"></div>
-          <p id="strongestText"></p>
-        </article>
-
-        <article class="card insight weak-card">
-          <div class="mini-label">⚠️ AREA REQUIRING MOST ATTENTION</div>
-          <h3 id="weakestArea"></h3>
-          <div class="big-score" id="weakestScore"></div>
-          <p id="weakestText"></p>
-        </article>
-      </div>
-
-      <section class="card priority-card">
-        <div class="mini-label">🎯 PRIORITY AREAS TO IMPROVE</div>
-        <div id="priorityAreas"></div>
-      </section>
-
-      <section class="card recommendation-card">
-        <div class="mini-label">💡 SMART RECOMMENDATION</div>
-        <h3 id="recommendationTitle"></h3>
-        <p id="recommendationText"></p>
-      </section>
-
-      <section class="method card">
-        <button type="button" class="method-toggle" id="methodToggle">
-          <span>How is this calculated?</span>
-          <span id="methodIcon">+</span>
+        <button
+          class="ghost"
+          id="newAssessment"
+        >
+          New Assessment
         </button>
 
-        <div id="methodContent" class="method-content">
-          <p><b>Overall Effectiveness</b> is a weighted score based on:</p>
+      </div>
 
-          <div class="formula">
-            Trainer Observation × 35%<br>+
-            Participant Feedback × 20%<br>+
-            Knowledge Assessment × 15%<br>+
-            Learning Application × 20%<br>+
-            Attendance / Completion × 10%
+
+      <!-- OVERALL RESULT -->
+
+      <div class="hero-result card">
+
+        <div
+          class="gauge"
+          id="gauge"
+        >
+
+          <div class="gauge-inner">
+
+            <strong id="overallScore">
+              0.00
+            </strong>
+
+            <span>
+              % EFFECTIVENESS
+            </span>
+
           </div>
 
-          <p>The final rating also considers critical thresholds for overall performance, trainer observation and learning application.</p>
         </div>
+
+
+        <div class="rating-copy">
+
+          <div
+            id="ratingBadge"
+            class="rating"
+          >
+            SATISFACTORY
+          </div>
+
+          <h3 id="ratingHeadline">
+            A balanced result with room to improve.
+          </h3>
+
+          <p id="ratingDescription"></p>
+
+          <div
+            id="whyResult"
+            class="why-result"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- METRICS -->
+
+      <div
+        class="metrics-grid"
+        id="metricsGrid"
+      ></div>
+
+
+      <!-- INSIGHTS -->
+
+      <div class="insight-grid">
+
+        <article class="card insight strong-card">
+
+          <div class="mini-label">
+            🏆 STRONGEST AREA
+          </div>
+
+          <h3 id="strongestArea"></h3>
+
+          <div
+            class="big-score"
+            id="strongestScore"
+          ></div>
+
+          <p id="strongestText"></p>
+
+        </article>
+
+
+        <article class="card insight weak-card">
+
+          <div class="mini-label">
+            ⚠️ AREA REQUIRING MOST ATTENTION
+          </div>
+
+          <h3 id="weakestArea"></h3>
+
+          <div
+            class="big-score"
+            id="weakestScore"
+          ></div>
+
+          <p id="weakestText"></p>
+
+        </article>
+
+      </div>
+
+
+      <!-- PRIORITY AREAS -->
+
+      <section class="card priority-card">
+
+        <div class="mini-label">
+          🎯 PRIORITY AREAS TO IMPROVE
+        </div>
+
+        <div id="priorityAreas"></div>
+
       </section>
 
+
+      <!-- SMART RECOMMENDATION -->
+
+      <section class="card recommendation-card">
+
+        <div class="mini-label">
+          💡 SMART RECOMMENDATION
+        </div>
+
+        <h3 id="recommendationTitle"></h3>
+
+        <p id="recommendationText"></p>
+
+      </section>
+
+
+      <!-- METHOD -->
+
+      <section class="method card">
+
+        <button
+          type="button"
+          class="method-toggle"
+          id="methodToggle"
+        >
+
+          <span>
+            How is this calculated?
+          </span>
+
+          <span id="methodIcon">
+            +
+          </span>
+
+        </button>
+
+
+        <div
+          id="methodContent"
+          class="method-content"
+        >
+
+          <p>
+            <b>Overall Effectiveness</b>
+            is a weighted score based on:
+          </p>
+
+
+          <div class="formula">
+
+            Trainer Observation × 35%
+
+            <br>
+
+            +
+
+            <br>
+
+            Participant Feedback × 20%
+
+            <br>
+
+            +
+
+            <br>
+
+            Knowledge Assessment × 15%
+
+            <br>
+
+            +
+
+            <br>
+
+            Learning Application × 20%
+
+            <br>
+
+            +
+
+            <br>
+
+            Attendance / Completion × 10%
+
+          </div>
+
+
+          <p>
+            The final rating also considers critical thresholds
+            for overall performance, trainer observation
+            and learning application.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- REPORT ACTIONS -->
+
       <div class="report-actions">
-        <button class="ghost" id="editAssessment">← Edit Assessment</button>
-        <button class="primary" id="exportPDF">Export Report as PDF <span>↓</span></button>
+
+        <button
+          class="ghost"
+          id="editAssessment"
+        >
+          ← Edit Assessment
+        </button>
+
+
+        <button
+          class="primary"
+          id="exportPDF"
+        >
+          Export Report as PDF
+          <span>↓</span>
+        </button>
+
       </div>
+
     </section>
+
   </main>
 
+
   <footer>
-    GG LearnLabs · Training Effectiveness Assessment · Built for practical L&amp;D decisions
+
+    GG LearnLabs · Training Effectiveness Assessment ·
+    Built for practical L&amp;D decisions
+
   </footer>
 
-  <div id="toast" class="toast"></div>
+
+  <div
+    id="toast"
+    class="toast"
+  ></div>
+
+
+  <!-- EXISTING APPLICATION SCRIPT -->
 
   <script src="script.js"></script>
 
+
+  <!-- THEME SYSTEM -->
+
   <script>
     (function () {
-      const toggle = document.getElementById("themeToggle");
-      const storageKey = "ggLearnLabsTheme";
 
-      function setTheme(theme) {
-        const isLight = theme === "light";
-        document.documentElement.setAttribute("data-theme", theme);
-        toggle.setAttribute("aria-pressed", String(isLight));
-        toggle.setAttribute(
-          "aria-label",
-          isLight ? "Switch to dark mode" : "Switch to light mode"
-        );
-        localStorage.setItem(storageKey, theme);
+      const toggle = document.getElementById("themeToggle");
+
+      if (!toggle) {
+        return;
       }
 
-      const savedTheme = localStorage.getItem(storageKey);
-      const preferredTheme = window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: light)").matches
-        ? "light"
-        : "dark";
+      const storageKey = "ggLearnLabsTheme";
 
-      setTheme(savedTheme || preferredTheme);
 
-      toggle.addEventListener("click", function () {
-        const current = document.documentElement.getAttribute("data-theme") || "dark";
-        setTheme(current === "dark" ? "light" : "dark");
-      });
+      function setTheme(theme) {
+
+        const isLight = theme === "light";
+
+        document.documentElement.setAttribute(
+          "data-theme",
+          theme
+        );
+
+        toggle.setAttribute(
+          "aria-pressed",
+          String(isLight)
+        );
+
+        toggle.setAttribute(
+          "aria-label",
+          isLight
+            ? "Switch to dark mode"
+            : "Switch to light mode"
+        );
+
+        localStorage.setItem(
+          storageKey,
+          theme
+        );
+
+      }
+
+
+      const savedTheme =
+        localStorage.getItem(storageKey);
+
+
+      const preferredTheme =
+        window.matchMedia &&
+        window.matchMedia(
+          "(prefers-color-scheme: light)"
+        ).matches
+          ? "light"
+          : "dark";
+
+
+      setTheme(
+        savedTheme || preferredTheme
+      );
+
+
+      toggle.addEventListener(
+        "click",
+        function () {
+
+          const currentTheme =
+            document.documentElement.getAttribute(
+              "data-theme"
+            ) || "dark";
+
+
+          setTheme(
+            currentTheme === "dark"
+              ? "light"
+              : "dark"
+          );
+
+        }
+      );
+
     })();
   </script>
+
 </body>
 </html>
