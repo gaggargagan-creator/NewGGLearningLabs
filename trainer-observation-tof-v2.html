@@ -4,48 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GG LearnLabs | Trainer Observation Form</title>
-  <meta name="description" content="GG LearnLabs Trainer Observation Form based on the organization's TOF template.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- html2pdf.js: primary CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
-    :root {
+    :root{
       --bg:#091111;
-      --bg2:#0e1918;
       --panel:#101b1b;
-      --panel-2:#132121;
+      --panel2:#132121;
       --text:#edf4f2;
       --heading:#f5faf8;
       --muted:#91a3a0;
       --line:rgba(188,220,214,.14);
       --teal:#55dfc7;
-      --teal-dark:#0f8d7b;
       --amber:#f2b75e;
       --red:#ff7070;
-      --blue:#6ea9ff;
       --yes:#50cfb3;
       --no:#eb7171;
       --na:#899a97;
       --shadow:0 20px 55px rgba(0,0,0,.16);
     }
 
-    html[data-theme="light"] {
+    html[data-theme="light"]{
       --bg:#f4f7f6;
-      --bg2:#ffffff;
-      --panel:#ffffff;
-      --panel-2:#f8fbfa;
+      --panel:#fff;
+      --panel2:#f8fbfa;
       --text:#1b2927;
       --heading:#172522;
       --muted:#657570;
       --line:rgba(25,55,50,.14);
       --teal:#128f7e;
-      --teal-dark:#0d7568;
       --amber:#c98518;
       --red:#c85959;
-      --blue:#4278ba;
       --yes:#158d7b;
       --no:#c75a5a;
       --na:#71817e;
@@ -63,7 +58,6 @@
         radial-gradient(circle at 8% 0%,color-mix(in srgb,var(--teal) 14%,transparent),transparent 28%),
         radial-gradient(circle at 94% 20%,color-mix(in srgb,var(--amber) 10%,transparent),transparent 24%),
         var(--bg);
-      transition:background .25s ease,color .25s ease;
     }
 
     .grid{
@@ -73,212 +67,113 @@
       mask-image:linear-gradient(to bottom,#000,transparent 88%);
     }
 
-    .page{
-      position:relative;z-index:1;
-      max-width:1220px;margin:0 auto;
-      padding:0 28px 80px;
-    }
-
-    header{
-      min-height:92px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-      border-bottom:1px solid var(--line);
-    }
-
-    .brand{
-      display:flex;align-items:center;gap:14px;
-      text-decoration:none;color:var(--text);
-      min-width:0;
-    }
-
-    .brand img{
-      width:155px;height:auto;max-height:50px;
-      object-fit:contain;object-position:left center;
-      display:block;
-    }
-
+    .page{position:relative;z-index:1;max-width:1220px;margin:0 auto;padding:0 28px 80px}
+    header{min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text);min-width:0}
+    .brand img{width:155px;height:auto;max-height:50px;object-fit:contain;object-position:left center;display:block}
     .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
     .btn{
-      border:1px solid var(--line);
-      border-radius:999px;
-      min-height:44px;
-      padding:11px 17px;
-      background:color-mix(in srgb,var(--panel) 88%,transparent);
-      color:var(--text);
-      font:600 13px Inter,sans-serif;
-      cursor:pointer;
-      text-decoration:none;
-      transition:.2s;
+      border:1px solid var(--line);border-radius:999px;min-height:44px;padding:11px 17px;
+      background:color-mix(in srgb,var(--panel) 88%,transparent);color:var(--text);
+      font:600 13px Inter,sans-serif;cursor:pointer;text-decoration:none;transition:.2s
     }
     .btn:hover{border-color:var(--teal);transform:translateY(-1px)}
     .btn-primary{background:var(--teal);border-color:var(--teal);color:#06201c}
     .btn-primary:hover{box-shadow:0 10px 26px color-mix(in srgb,var(--teal) 20%,transparent)}
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
     .theme-toggle{
-      width:110px;height:44px;padding:5px 9px;
-      display:flex;align-items:center;justify-content:space-between;gap:7px;
-      border:1px solid var(--line);border-radius:999px;
-      background:var(--panel);color:var(--muted);cursor:pointer;
-      transition:.2s;
+      width:110px;height:44px;padding:5px 9px;display:flex;align-items:center;justify-content:space-between;gap:7px;
+      border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--muted);cursor:pointer
     }
     .theme-toggle:hover{border-color:var(--teal)}
-    .theme-track{
-      position:relative;width:43px;height:24px;border-radius:99px;
-      background:color-mix(in srgb,var(--muted) 22%,transparent);
-      border:1px solid var(--line);
-    }
-    .theme-thumb{
-      position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
-      background:var(--teal);transition:.25s;box-shadow:0 2px 7px rgba(0,0,0,.2)
-    }
+    .theme-track{position:relative;width:43px;height:24px;border-radius:99px;background:color-mix(in srgb,var(--muted) 22%,transparent);border:1px solid var(--line)}
+    .theme-thumb{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--teal);transition:.25s;box-shadow:0 2px 7px rgba(0,0,0,.2)}
     html[data-theme="light"] .theme-thumb{transform:translateX(18px);background:var(--amber)}
     .sun{color:var(--amber)} .moon{color:var(--teal)}
 
     .hero{padding:58px 0 30px}
-    .eyebrow,.mini,.section-number{
-      color:var(--teal);
-      font:500 11px/1.3 "IBM Plex Mono",monospace;
-      letter-spacing:.14em;
+    .eyebrow,.mini{
+      color:var(--teal);font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.14em
     }
     h1,h2,h3{font-family:Fraunces,Georgia,serif;letter-spacing:-.035em;color:var(--heading)}
     h1{font-size:clamp(44px,6vw,72px);line-height:1;margin:14px 0}
+    h1 em{color:var(--teal)}
     h2{font-size:clamp(31px,4vw,46px);line-height:1.05;margin:7px 0}
     h3{font-size:24px;margin:7px 0}
     .hero p,.section-head p{max-width:820px;color:var(--muted);line-height:1.72;font-size:16px}
 
-    .panel{
-      background:color-mix(in srgb,var(--panel) 88%,transparent);
-      border:1px solid var(--line);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-    }
+    .panel{background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
     html[data-theme="light"] .panel{background:rgba(255,255,255,.8)}
-
     .section{padding:26px;margin-top:18px}
     .section-head{margin-bottom:22px}
 
-    .details-grid{
-      display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px
-    }
-
-    label{
-      display:flex;flex-direction:column;gap:8px;
-      font-size:12px;color:var(--muted)
-    }
-
+    .details-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+    label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--muted)}
     .full{grid-column:1/-1}
-
     input,textarea{
-      width:100%;
-      padding:14px 15px;
-      min-height:48px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:color-mix(in srgb,var(--panel-2) 92%,transparent);
-      color:var(--text);
-      outline:none;
-      font:14px Inter,sans-serif;
+      width:100%;padding:14px 15px;min-height:48px;border:1px solid var(--line);border-radius:12px;
+      background:color-mix(in srgb,var(--panel2) 92%,transparent);color:var(--text);outline:none;font:14px Inter,sans-serif
     }
     textarea{min-height:82px;resize:vertical}
     input:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px color-mix(in srgb,var(--teal) 10%,transparent)}
-    html[data-theme="light"] input,
-    html[data-theme="light"] textarea{background:#fff}
+    html[data-theme="light"] input,html[data-theme="light"] textarea{background:#fff}
     input[type="date"],input[type="time"]{color-scheme:dark}
-    html[data-theme="light"] input[type="date"],
-    html[data-theme="light"] input[type="time"]{color-scheme:light}
+    html[data-theme="light"] input[type="date"],html[data-theme="light"] input[type="time"]{color-scheme:light}
 
     .section-block{margin-top:24px}
     .section-banner{
-      padding:15px 17px;
-      border:1px solid var(--line);
-      border-radius:14px;
+      padding:15px 17px;border:1px solid var(--line);border-radius:14px;
       background:color-mix(in srgb,var(--teal) 5%,var(--panel));
       display:flex;justify-content:space-between;align-items:center;gap:10px
     }
     .section-banner strong{font:600 15px Inter,sans-serif;color:var(--heading)}
     .section-score-badge{
-      min-width:86px;text-align:center;
-      padding:7px 10px;border-radius:999px;border:1px solid var(--line);
+      min-width:86px;text-align:center;padding:7px 10px;border-radius:999px;border:1px solid var(--line);
       font:600 10px "IBM Plex Mono";color:var(--muted)
     }
 
     .criteria{display:grid;gap:10px;margin-top:10px}
     .criterion{
-      display:grid;
-      grid-template-columns:minmax(0,1.55fr) 160px minmax(190px,.9fr);
-      gap:16px;align-items:center;
-      padding:15px;
-      border:1px solid var(--line);
-      border-radius:15px;
-      background:color-mix(in srgb,var(--panel-2) 72%,transparent);
+      display:grid;grid-template-columns:minmax(0,1.55fr) 160px minmax(190px,.9fr);
+      gap:16px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:15px;
+      background:color-mix(in srgb,var(--panel2) 72%,transparent)
     }
-
     html[data-theme="light"] .criterion{background:rgba(255,255,255,.6)}
-
     .criterion-name{font-size:13px;line-height:1.48;color:var(--heading);font-weight:600}
     .criterion-help{font-size:10px;color:var(--muted);margin-top:4px}
-
     .rating-group{display:flex;gap:7px;align-items:center;justify-content:center}
     .rating-btn{
-      width:42px;height:34px;border-radius:9px;
-      border:1px solid var(--line);
-      background:transparent;color:var(--muted);
+      width:42px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);
       font:600 10px "IBM Plex Mono";cursor:pointer;transition:.15s
     }
     .rating-btn:hover{border-color:var(--teal);color:var(--text)}
     .rating-btn.selected.yes{background:var(--yes);border-color:var(--yes);color:#06201c}
     .rating-btn.selected.no{background:var(--no);border-color:var(--no);color:#fff}
     .rating-btn.selected.na{background:var(--na);border-color:var(--na);color:#fff}
-
     .comment-box textarea{min-height:62px;font-size:12px}
 
-    .legend{
-      display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;
-      color:var(--muted);font:10px "IBM Plex Mono"
-    }
+    .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;color:var(--muted);font:10px "IBM Plex Mono"}
     .legend span{display:inline-flex;align-items:center;gap:6px}
     .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
     .dot.yes{background:var(--yes)} .dot.no{background:var(--no)} .dot.na{background:var(--na)}
-
     .submit-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:24px}
     .status-note{color:var(--muted);font-size:12px}
 
     /* RESULTS */
     #results{margin-top:18px}
-    .result-hero{
-      display:grid;grid-template-columns:250px 1fr;gap:30px;align-items:center;
-      padding:28px
-    }
-
-    .gauge{
-      width:210px;height:210px;margin:auto;border-radius:50%;
-      background:conic-gradient(var(--teal) var(--deg),var(--line) 0);
-      display:grid;place-items:center;position:relative
-    }
-    .gauge::after{
-      content:"";position:absolute;inset:12px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line)
-    }
+    .result-hero{display:grid;grid-template-columns:250px 1fr;gap:30px;align-items:center;padding:28px}
+    .gauge{width:210px;height:210px;margin:auto;border-radius:50%;background:conic-gradient(var(--teal) var(--deg),var(--line) 0);display:grid;place-items:center;position:relative}
+    .gauge::after{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--panel2);border:1px solid var(--line)}
     .gauge-inner{position:relative;z-index:1;text-align:center}
     .gauge-inner strong{display:block;font:500 42px "IBM Plex Mono";color:var(--heading)}
     .gauge-inner span{font:9px "IBM Plex Mono";letter-spacing:.12em;color:var(--muted)}
-
-    .rating-pill{
-      display:inline-flex;padding:8px 12px;border-radius:999px;
-      border:1px solid var(--line);color:var(--teal);
-      font:600 10px "IBM Plex Mono";letter-spacing:.08em
-    }
+    .rating-pill{display:inline-flex;padding:8px 12px;border-radius:999px;border:1px solid var(--line);color:var(--teal);font:600 10px "IBM Plex Mono";letter-spacing:.08em}
     .summary-text{color:var(--muted);line-height:1.7}
-
-    .summary-grid{
-      display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px
-    }
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
     .summary-card{padding:23px}
     .big{font:500 36px "IBM Plex Mono";color:var(--teal);margin-top:8px}
-
     .profile{margin-top:18px;padding:23px}
     .bars{display:grid;gap:10px;margin-top:18px}
     .bar-row{display:grid;grid-template-columns:minmax(180px,1.2fr) 2fr 55px;gap:12px;align-items:center}
@@ -286,23 +181,65 @@
     .bar-track{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
     .bar-fill{height:100%;background:var(--teal);border-radius:99px}
     .bar-score{text-align:right;font:500 11px "IBM Plex Mono";color:var(--text)}
-
     .comment-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
     .comment-card{padding:23px}
     .comment-list{margin:14px 0 0;padding-left:18px;color:var(--muted);line-height:1.7;font-size:13px}
     .comment-list li{margin-bottom:6px}
-
     .action-plan{margin-top:18px;padding:23px}
     .action-plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
-
     .overall-comments{margin-top:18px;padding:23px}
-
-    .footer-actions{
-      display:flex;justify-content:space-between;gap:12px;margin-top:22px
-    }
-
+    .footer-actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
     .hidden{display:none!important}
     footer{padding:30px 0 0;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}
+
+    /* PDF template */
+    #pdfReport{
+      position:fixed;
+      left:-100000px;
+      top:0;
+      width:794px;
+      background:#fff;
+      color:#1b2927;
+      padding:42px 48px;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    #pdfReport .pdf-header{border-bottom:2px solid #138f7e;padding-bottom:16px;margin-bottom:20px}
+    #pdfReport .pdf-brand{font:bold 13px Arial;color:#138f7e;letter-spacing:1.2px}
+    #pdfReport .pdf-title{font:bold 25px Arial;color:#1b2927;margin-top:6px}
+    #pdfReport .pdf-meta{font:11px Arial;color:#647571;line-height:1.6;margin-top:8px}
+    #pdfReport .pdf-score{
+      display:flex;justify-content:space-between;align-items:center;
+      background:#f0f8f6;border:1px solid #d6e6e1;border-radius:12px;padding:18px;margin:18px 0 22px
+    }
+    #pdfReport .pdf-score-label{font:bold 10px Arial;color:#138f7e;text-transform:uppercase;letter-spacing:1px}
+    #pdfReport .pdf-score-value{font:bold 34px Arial;color:#1b2927;margin-top:7px}
+    #pdfReport .pdf-rating{font:bold 11px Arial;color:#138f7e}
+    #pdfReport .pdf-section{page-break-inside:avoid;margin:0 0 20px}
+    #pdfReport .pdf-section-title{font:bold 15px Arial;color:#1b2927;border-bottom:1px solid #dce5e2;padding-bottom:7px;margin-bottom:9px}
+    #pdfReport .pdf-section-score{font:10px Arial;color:#138f7e;margin-left:5px}
+    #pdfReport .pdf-criterion{page-break-inside:avoid;border:1px solid #dfe7e4;border-radius:8px;padding:9px 10px;margin:6px 0}
+    #pdfReport .pdf-row{display:grid;grid-template-columns:1fr 78px;gap:10px;align-items:start}
+    #pdfReport .pdf-criterion-name{font:bold 9.5px/1.4 Arial;color:#253532}
+    #pdfReport .pdf-response{text-align:right;font:bold 9px Arial}
+    #pdfReport .pdf-response.y{color:#138f7e}
+    #pdfReport .pdf-response.n{color:#c85959}
+    #pdfReport .pdf-response.na{color:#71817e}
+    #pdfReport .pdf-comment{margin-top:6px;font:8.5px/1.45 Arial;color:#647571}
+    #pdfReport .pdf-comment span{font-weight:bold;color:#334542}
+    #pdfReport .pdf-insights{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+    #pdfReport .pdf-insight{border-radius:10px;padding:13px;border:1px solid #dce5e2}
+    #pdfReport .pdf-insight.green{background:#f1faf7}
+    #pdfReport .pdf-insight.amber{background:#fff8ee}
+    #pdfReport .pdf-insight-label{font:bold 8px Arial;letter-spacing:1px}
+    #pdfReport .pdf-insight.green .pdf-insight-label{color:#138f7e}
+    #pdfReport .pdf-insight.amber .pdf-insight-label{color:#c98518}
+    #pdfReport .pdf-insight-title{font:bold 12px Arial;color:#1b2927;margin-top:7px}
+    #pdfReport .pdf-insight-score{font:bold 19px Arial;color:#138f7e;margin-top:4px}
+    #pdfReport .pdf-box{page-break-inside:avoid;border:1px solid #dce5e2;border-radius:10px;padding:14px;margin-top:14px}
+    #pdfReport .pdf-box-title{font:bold 9px Arial;color:#138f7e;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+    #pdfReport .pdf-box-text{font:9.5px/1.55 Arial;color:#4f625e}
+    #pdfReport .pdf-footer{border-top:1px solid #dce5e2;margin-top:22px;padding-top:8px;font:8px Arial;color:#7a8986}
+    .pdf-page-break{page-break-before:always}
 
     @media(max-width:900px){
       .criterion{grid-template-columns:1fr}
@@ -310,142 +247,6 @@
       .comment-box textarea{min-height:78px}
       .result-hero{grid-template-columns:1fr}
     }
-
-    /* PDF EXPORT STYLES */
-    .pdf-export {
-      display:block !important;
-      width:100% !important;
-      max-width:794px !important;
-      margin:0 !important;
-      padding:24px !important;
-      background:#ffffff !important;
-      color:#172522 !important;
-      border-radius:0 !important;
-      box-shadow:none !important;
-    }
-
-    .pdf-export .panel,
-    .pdf-export .summary-card,
-    .pdf-export .profile,
-    .pdf-export .comment-card,
-    .pdf-export .action-plan,
-    .pdf-export .overall-comments {
-      background:#ffffff !important;
-      color:#172522 !important;
-      box-shadow:none !important;
-      border-color:#d8e0dd !important;
-    }
-
-    .pdf-export h1,
-    .pdf-export h2,
-    .pdf-export h3,
-    .pdf-export .criterion-name,
-    .pdf-export .bar-score,
-    .pdf-export .gauge-inner strong {
-      color:#172522 !important;
-    }
-
-    .pdf-export p,
-    .pdf-export .summary-text,
-    .pdf-export .bar-name,
-    .pdf-export .criterion-help {
-      color:#5e6f6a !important;
-    }
-
-    .pdf-header {
-      padding:0 0 18px;
-      margin:0 0 22px;
-      border-bottom:2px solid #168c7b;
-    }
-
-    .pdf-brand {
-      color:#168c7b;
-      font:700 10px "IBM Plex Mono",monospace;
-      letter-spacing:.14em;
-    }
-
-    .pdf-title {
-      color:#172522;
-      font:700 27px Fraunces,Georgia,serif;
-      letter-spacing:-.03em;
-      margin-top:6px;
-    }
-
-    .pdf-subtitle {
-      color:#6a7975;
-      font-size:10px;
-      margin-top:3px;
-    }
-
-    .pdf-export .result-hero {
-      grid-template-columns:190px 1fr;
-      background:#f7faf9 !important;
-      border-color:#d8e0dd !important;
-    }
-
-    .pdf-export .gauge {
-      width:160px;
-      height:160px;
-      background:conic-gradient(#168c7b var(--deg),#dde6e2 0) !important;
-    }
-
-    .pdf-export .gauge::after {
-      background:#ffffff !important;
-      border-color:#d8e0dd !important;
-    }
-
-    .pdf-export .gauge-inner strong {
-      font-size:31px;
-    }
-
-    .pdf-export .summary-grid,
-    .pdf-export .comment-grid {
-      grid-template-columns:1fr 1fr;
-    }
-
-    .pdf-export .bar-fill {
-      background:#168c7b !important;
-    }
-
-    .pdf-export .rating-pill {
-      color:#168c7b !important;
-      border-color:#9ed4ca !important;
-      background:#edf8f5 !important;
-    }
-
-    .pdf-field-value {
-      min-height:60px;
-      padding:12px 14px;
-      border:1px solid #d8e0dd;
-      border-radius:10px;
-      color:#263632;
-      background:#fbfcfc;
-      white-space:pre-wrap;
-      font-size:11px;
-      line-height:1.55;
-    }
-
-    .pdf-footer-note {
-      margin-top:24px;
-      padding-top:10px;
-      border-top:1px solid #d8e0dd;
-      color:#7a8884;
-      font:8px "IBM Plex Mono",monospace;
-    }
-
-    .pdf-export .mini,
-    .pdf-export .eyebrow {
-      color:#168c7b !important;
-    }
-
-    .pdf-export .section {
-      page-break-inside:avoid;
-    }
-
-    .pdf-export .criterion {
-      page-break-inside:avoid;
-    }
-
     @media(max-width:700px){
       .page{padding:0 16px 60px}
       header{padding:18px 0;min-height:74px}
@@ -488,12 +289,11 @@
       <p>
         A digital version of the existing TOF structure used by the Learning &amp; Development Team.
         Rate each observation point as <strong>Y</strong>, <strong>N</strong> or <strong>N/A</strong>,
-        add evidence in comments, and generate the same style of overall score logic.
+        add evidence in comments, and generate a clear observation report.
       </p>
     </section>
 
     <form id="tofForm">
-
       <section class="panel section">
         <div class="section-head">
           <div class="mini">01 — OBSERVATION DETAILS</div>
@@ -502,35 +302,12 @@
         </div>
 
         <div class="details-grid">
-          <label>
-            Trainer Name
-            <input id="trainerName" required>
-          </label>
-
-          <label>
-            Name of the Evaluator
-            <input id="evaluatorName" required>
-          </label>
-
-          <label>
-            Observation Date
-            <input id="observationDate" type="date" required>
-          </label>
-
-          <label>
-            Observation Time
-            <input id="observationTime" type="time">
-          </label>
-
-          <label>
-            Class name/topic
-            <input id="classTopic" required>
-          </label>
-
-          <label>
-            Course Duration (In Mins.)
-            <input id="courseDuration" type="number" min="1">
-          </label>
+          <label>Trainer Name<input id="trainerName" required></label>
+          <label>Name of the Evaluator<input id="evaluatorName" required></label>
+          <label>Observation Date<input id="observationDate" type="date" required></label>
+          <label>Observation Time<input id="observationTime" type="time"></label>
+          <label>Class name/topic<input id="classTopic" required></label>
+          <label>Course Duration (In Mins.)<input id="courseDuration" type="number" min="1"></label>
         </div>
       </section>
 
@@ -540,7 +317,7 @@
         <div class="section-head">
           <div class="mini">08 — COMPLETE OBSERVATION</div>
           <h2>Generate the TOF readout</h2>
-          <p>The overall score follows the workbook methodology: Y is a positive result, N is a negative result, and N/A is excluded from the denominator.</p>
+          <p>Y counts as positive, N counts as negative, and N/A is excluded from the denominator.</p>
         </div>
 
         <div class="legend">
@@ -557,7 +334,6 @@
     </form>
 
     <section id="results" class="hidden">
-
       <div class="panel result-hero">
         <div class="gauge" id="gauge">
           <div class="gauge-inner">
@@ -599,19 +375,13 @@
         <article class="panel comment-card">
           <div class="mini">OBSERVED STRENGTHS</div>
           <ul class="comment-list" id="strengthList"></ul>
-          <label style="margin-top:16px;">
-            Strength Evidence / Comments
-            <textarea id="strengthComments" placeholder="Add specific evidence from the session..."></textarea>
-          </label>
+          <label style="margin-top:16px;">Strength Evidence / Comments<textarea id="strengthComments" placeholder="Add specific evidence from the session..."></textarea></label>
         </article>
 
         <article class="panel comment-card">
           <div class="mini">DEVELOPMENT AREAS</div>
           <ul class="comment-list" id="developmentList"></ul>
-          <label style="margin-top:16px;">
-            Development Evidence / Comments
-            <textarea id="developmentComments" placeholder="Add specific feedback or coaching observations..."></textarea>
-          </label>
+          <label style="margin-top:16px;">Development Evidence / Comments<textarea id="developmentComments" placeholder="Add specific feedback or coaching observations..."></textarea></label>
         </article>
       </div>
 
@@ -621,15 +391,8 @@
         <p class="summary-text" id="coachingText"></p>
 
         <div class="action-plan-grid">
-          <label>
-            Recommended Action
-            <textarea id="actionPlan" placeholder="What should be continued, changed or practised?"></textarea>
-          </label>
-
-          <label>
-            Follow-up / Success Measure
-            <textarea id="successMeasure" placeholder="How will improvement be verified?"></textarea>
-          </label>
+          <label>Recommended Action<textarea id="actionPlan" placeholder="What should be continued, changed or practised?"></textarea></label>
+          <label>Follow-up / Success Measure<textarea id="successMeasure" placeholder="How will improvement be verified?"></textarea></label>
         </div>
       </section>
 
@@ -647,12 +410,13 @@
     <footer>GG LearnLabs · Trainer Observation Form · Based on the Learning &amp; Development Team TOF template</footer>
   </div>
 
+  <!-- Off-screen HTML report used by html2pdf.js -->
+  <div id="pdfReport" aria-hidden="true"></div>
+
   <script>
     const sections = [
       {
-        id:"classroomReadiness",
-        number:1,
-        name:"1. Classroom Readiness",
+        id:"classroomReadiness", name:"1. Classroom Readiness",
         criteria:[
           "Preparedness and Utilization of Training Equipment's / Technology",
           "Availability and Organization of Training Materials and Supplies",
@@ -661,9 +425,7 @@
         ]
       },
       {
-        id:"facilitatorReadiness",
-        number:2,
-        name:"2. Facilitator Readiness",
+        id:"facilitatorReadiness", name:"2. Facilitator Readiness",
         criteria:[
           "Facilitator Presence at Least 15 Minutes Prior to Session Start",
           "Establishment of a Positive Learning Environment through Rapport Building",
@@ -671,9 +433,7 @@
         ]
       },
       {
-        id:"trainingIntroduction",
-        number:3,
-        name:"3. Training Introduction",
+        id:"trainingIntroduction", name:"3. Training Introduction",
         criteria:[
           "Utilization of an Engaging and Impactful Opening",
           "Clearly Communicated the “What’s In It For Me” (WIIFM) to Learners",
@@ -682,9 +442,7 @@
         ]
       },
       {
-        id:"facilitationSkills",
-        number:4,
-        name:"4. Facilitation Skills",
+        id:"facilitationSkills", name:"4. Facilitation Skills",
         criteria:[
           "Effective Use of Vocal Dynamics (Voice and Tone)",
           "Adaptation of Speech Rate to Support Learner Needs",
@@ -700,9 +458,7 @@
         ]
       },
       {
-        id:"contentExpertise",
-        number:5,
-        name:"5. Content / Subject Matter Expertise",
+        id:"contentExpertise", name:"5. Content / Subject Matter Expertise",
         criteria:[
           "Effective Use of Facilitator Guide and Training Materials",
           "Ensured completeness of training /content delivered",
@@ -712,9 +468,7 @@
         ]
       },
       {
-        id:"classroomManagement",
-        number:6,
-        name:"6. Classroom Management / Professionalism",
+        id:"classroomManagement", name:"6. Classroom Management / Professionalism",
         criteria:[
           "Approachability and Confidence",
           "Professional Appearance and Attire",
@@ -725,9 +479,7 @@
         ]
       },
       {
-        id:"closing",
-        number:7,
-        name:"7. Closing",
+        id:"closing", name:"7. Closing",
         criteria:[
           "Summary of Key Points and Identification of Learning Gaps",
           "Completion and Accuracy of Knowledge and Skills Assessment",
@@ -737,501 +489,527 @@
     ];
 
     const responses = {};
-
     const $ = id => document.getElementById(id);
 
-    function renderSections() {
-      let html = "";
-
-      sections.forEach(section => {
-        html += `
-          <section class="panel section section-block">
-            <div class="section-banner">
-              <strong>${section.name}</strong>
-              <span class="section-score-badge" id="${section.id}Score">0 / ${section.criteria.length}</span>
-            </div>
-
-            <div class="criteria">
-              ${section.criteria.map((criterion, index) => {
-                const id = `${section.id}_${index + 1}`;
-                return `
-                  <article class="criterion">
-                    <div>
-                      <div class="criterion-name">${criterion}</div>
-                      <div class="criterion-help">Rate the observed condition using the original TOF response model.</div>
-                    </div>
-
-                    <div class="rating-group" aria-label="${criterion}">
-                      <button type="button" class="rating-btn" data-criterion="${id}" data-value="Y">Y</button>
-                      <button type="button" class="rating-btn" data-criterion="${id}" data-value="N">N</button>
-                      <button type="button" class="rating-btn" data-criterion="${id}" data-value="N/A">N/A</button>
-                    </div>
-
-                    <div class="comment-box">
-                      <textarea id="${id}_comment" placeholder="Comments / evidence"></textarea>
-                    </div>
-                  </article>
-                `;
-              }).join("")}
-            </div>
-          </section>
-        `;
-      });
-
-      $("sections").innerHTML = html;
+    function renderSections(){
+      $("sections").innerHTML = sections.map(section => `
+        <section class="panel section section-block">
+          <div class="section-banner">
+            <strong>${section.name}</strong>
+            <span class="section-score-badge" id="${section.id}Score">0 / ${section.criteria.length}</span>
+          </div>
+          <div class="criteria">
+            ${section.criteria.map((criterion,index)=>{
+              const id = `${section.id}_${index+1}`;
+              return `
+                <article class="criterion">
+                  <div>
+                    <div class="criterion-name">${criterion}</div>
+                    <div class="criterion-help">Use the original TOF Y / N / N/A response model.</div>
+                  </div>
+                  <div class="rating-group" aria-label="${criterion}">
+                    <button type="button" class="rating-btn" data-criterion="${id}" data-value="Y">Y</button>
+                    <button type="button" class="rating-btn" data-criterion="${id}" data-value="N">N</button>
+                    <button type="button" class="rating-btn" data-criterion="${id}" data-value="N/A">N/A</button>
+                  </div>
+                  <div class="comment-box">
+                    <textarea id="${id}_comment" placeholder="Comments / evidence"></textarea>
+                  </div>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `).join("");
     }
 
-    function updateCriterionButton(id, value) {
-      document.querySelectorAll(`[data-criterion="${id}"]`).forEach(button => {
+    function updateCriterionButton(id,value){
+      document.querySelectorAll(`[data-criterion="${id}"]`).forEach(button=>{
         button.classList.remove("selected","yes","no","na");
-
-        if (button.dataset.value === value) {
+        if(button.dataset.value===value){
           button.classList.add("selected");
-
-          if (value === "Y") button.classList.add("yes");
-          if (value === "N") button.classList.add("no");
-          if (value === "N/A") button.classList.add("na");
+          if(value==="Y") button.classList.add("yes");
+          if(value==="N") button.classList.add("no");
+          if(value==="N/A") button.classList.add("na");
         }
       });
     }
 
-    function updateProgress() {
-      const total = sections.reduce((sum, section) => sum + section.criteria.length, 0);
-      const scored = Object.keys(responses).length;
-
+    function updateProgress(){
+      const total = sections.reduce((sum,section)=>sum+section.criteria.length,0);
+      const scored = Object.keys(responses).filter(key=>!key.endsWith("_comment")).length;
       $("completionStatus").textContent = `${scored} of ${total} criteria scored`;
     }
 
-    function updateSectionScore(section) {
-      let yes = 0;
-      let no = 0;
-
-      section.criteria.forEach((_, index) => {
-        const value = responses[`${section.id}_${index + 1}`];
-        if (value === "Y") yes++;
-        if (value === "N") no++;
+    function getSectionResult(section){
+      let yes=0,no=0,na=0;
+      section.criteria.forEach((_,index)=>{
+        const value=responses[`${section.id}_${index+1}`];
+        if(value==="Y") yes++;
+        else if(value==="N") no++;
+        else if(value==="N/A") na++;
       });
-
-      const denominator = yes + no;
-      const pct = denominator ? (yes / denominator) * 100 : 0;
-
-      $(`${section.id}Score`).textContent =
-        denominator
-          ? `${pct.toFixed(1)}% · ${yes}/${denominator}`
-          : `0 / ${section.criteria.length}`;
-    }
-
-    function getSectionResult(section) {
-      let yes = 0;
-      let no = 0;
-      let na = 0;
-
-      section.criteria.forEach((_, index) => {
-        const value = responses[`${section.id}_${index + 1}`];
-
-        if (value === "Y") yes++;
-        else if (value === "N") no++;
-        else if (value === "N/A") na++;
-      });
-
-      const denominator = yes + no;
-      const score = denominator ? (yes / denominator) * 100 : null;
-
+      const denominator=yes+no;
       return {
         ...section,
-        yes,
-        no,
-        na,
+        yes,no,na,
         denominator,
-        score
+        score:denominator ? (yes/denominator)*100 : null
       };
     }
 
-    function getOverallResult() {
-      let yes = 0;
-      let no = 0;
-      let na = 0;
-
-      sections.forEach(section => {
-        section.criteria.forEach((_, index) => {
-          const value = responses[`${section.id}_${index + 1}`];
-
-          if (value === "Y") yes++;
-          else if (value === "N") no++;
-          else if (value === "N/A") na++;
+    function getOverallResult(){
+      let yes=0,no=0,na=0;
+      sections.forEach(section=>{
+        section.criteria.forEach((_,index)=>{
+          const value=responses[`${section.id}_${index+1}`];
+          if(value==="Y") yes++;
+          else if(value==="N") no++;
+          else if(value==="N/A") na++;
         });
       });
-
-      const denominator = yes + no;
-      const score = denominator ? (yes / denominator) * 100 : 0;
-
-      return { yes, no, na, denominator, score };
+      const denominator=yes+no;
+      return {
+        yes,no,na,denominator,
+        score:denominator ? (yes/denominator)*100 : 0
+      };
     }
 
-    function getRating(score) {
-      if (score >= 90) {
-        return {
-          label:"STRONG",
-          title:"Strong trainer observation result.",
-          text:"The observation shows a consistently strong level of performance across the applicable TOF criteria. Continue reinforcing the behaviours that are working well and use targeted coaching for any remaining gaps."
-        };
-      }
-
-      if (score >= 80) {
-        return {
-          label:"SATISFACTORY",
-          title:"A satisfactory trainer observation result.",
-          text:"The trainer is meeting the expected standard across most applicable observation points. Focused coaching on the lower-performing areas can improve consistency."
-        };
-      }
-
-      if (score >= 70) {
-        return {
-          label:"NEEDS IMPROVEMENT",
-          title:"Trainer development is recommended.",
-          text:"The observation identifies several areas that need attention. Use targeted coaching and a follow-up observation to build consistency in the identified behaviours."
-        };
-      }
-
+    function getRating(score){
+      if(score>=90) return {
+        label:"STRONG",
+        title:"Strong trainer observation result.",
+        text:"The observation shows a consistently strong level of performance across the applicable TOF criteria."
+      };
+      if(score>=80) return {
+        label:"SATISFACTORY",
+        title:"A satisfactory trainer observation result.",
+        text:"The trainer is meeting the expected standard across most applicable observation points, with targeted opportunities for improvement."
+      };
+      if(score>=70) return {
+        label:"NEEDS IMPROVEMENT",
+        title:"Trainer development is recommended.",
+        text:"The observation identifies several areas that need attention. Targeted coaching and follow-up observation are recommended."
+      };
       return {
         label:"CRITICAL",
         title:"Immediate trainer development is recommended.",
-        text:"The observation identifies significant gaps across the applicable criteria. Prioritise coaching, support and a follow-up observation before similar sessions are delivered independently."
+        text:"The observation identifies significant gaps across the applicable criteria. Prioritise coaching, support and follow-up observation."
       };
     }
 
-    function getCoachingRecommendation(weakest) {
-      const map = {
+    function getCoachingRecommendation(weakest){
+      const map={
         classroomReadiness:[
           "Improve classroom readiness",
-          "Use a pre-session checklist covering technology, materials, learner name tents and classroom setup. Complete the checklist before entering the observation window."
+          "Use a pre-session checklist covering technology, materials, learner name tents and classroom setup."
         ],
         facilitatorReadiness:[
           "Strengthen facilitator readiness",
-          "Arrive early, prepare the room and establish rapport before the session begins. Maintain adherence to the planned session start and end times."
+          "Arrive early, prepare the room, establish rapport and maintain the scheduled session start and end times."
         ],
         trainingIntroduction:[
           "Strengthen the training opening",
-          "Use an engaging opening, clearly communicate WIIFM and learning objectives, and involve learners in identifying additional objectives where relevant."
+          "Use an engaging opening, clearly communicate WIIFM and objectives, and involve learners where appropriate."
         ],
         facilitationSkills:[
           "Sharpen facilitation behaviours",
-          "Focus coaching on the specific facilitation behaviours identified below, particularly communication, non-verbal cues, engagement, transitions and reinforcement of key points."
+          "Focus on communication, learner engagement, non-verbal cues, transitions and reinforcement of key learning points."
         ],
         contentExpertise:[
           "Strengthen content and activity management",
-          "Review the facilitator guide and content, confirm completeness and accuracy, and strengthen activity management and debriefing to support learning transfer."
+          "Review the facilitator guide and content, confirm completeness and accuracy, and strengthen debriefing and learning activities."
         ],
         classroomManagement:[
           "Strengthen professionalism and classroom management",
-          "Focus on confidence, adult learner respect, professional presence, problem-solving and timely management of distractions or inappropriate behaviour."
+          "Focus on confidence, adult learner respect, professional presence, problem-solving and management of distractions or inappropriate behaviour."
         ],
         closing:[
           "Improve session closure",
-          "Use a clear recap, identify learning gaps, complete the knowledge/skills assessment accurately and facilitate learner feedback through Level 1 evaluations."
+          "Use a clear recap, identify learning gaps, complete assessments accurately and facilitate Level 1 learner feedback."
         ]
       };
-
-      return map[weakest.id] || [
+      return map[weakest?.id] || [
         "Focus on the lowest-performing section",
         "Use targeted coaching and a follow-up observation to strengthen the lowest-performing applicable criteria."
       ];
     }
 
-    function renderResults() {
-      const overall = getOverallResult();
-      const resultSections = sections.map(getSectionResult);
+    function renderResults(){
+      const overall=getOverallResult();
+      const resultSections=sections.map(getSectionResult);
+      const applicable=resultSections.filter(s=>s.score!==null);
+      const strongest=[...applicable].sort((a,b)=>b.score-a.score)[0];
+      const weakest=[...applicable].sort((a,b)=>a.score-b.score)[0];
+      const rating=getRating(overall.score);
+      const coaching=getCoachingRecommendation(weakest);
 
-      const applicableSections = resultSections.filter(section => section.score !== null);
-      const strongest = [...applicableSections].sort((a,b) => b.score - a.score)[0];
-      const weakest = [...applicableSections].sort((a,b) => a.score - b.score)[0];
+      $("overallScore").textContent=`${overall.score.toFixed(1)}%`;
+      $("gauge").style.setProperty("--deg",`${overall.score*3.6}deg`);
+      $("overallRating").textContent=rating.label;
+      $("resultTitle").textContent=$("trainerName").value.trim() || "Trainer Observation";
+      $("resultSummary").textContent=`${rating.title} ${rating.text}`;
 
-      const rating = getRating(overall.score);
-      const coaching = getCoachingRecommendation(weakest);
+      $("strongestSection").textContent=strongest?.name || "—";
+      $("strongestScore").textContent=strongest ? `${strongest.score.toFixed(1)}%` : "—";
+      $("strongestText").textContent=strongest ? `${strongest.yes} Yes, ${strongest.no} No and ${strongest.na} N/A responses.` : "No applicable criteria were scored.";
 
-      $("overallScore").textContent = `${overall.score.toFixed(1)}%`;
-      $("gauge").style.setProperty("--deg", `${overall.score * 3.6}deg`);
-      $("overallRating").textContent = rating.label;
+      $("weakestSection").textContent=weakest?.name || "—";
+      $("weakestScore").textContent=weakest ? `${weakest.score.toFixed(1)}%` : "—";
+      $("weakestText").textContent=weakest ? `${weakest.yes} Yes, ${weakest.no} No and ${weakest.na} N/A responses.` : "No applicable criteria were scored.";
 
-      $("resultTitle").textContent =
-        $("trainerName").value.trim() || "Trainer Observation";
-
-      $("resultSummary").textContent =
-        `${rating.title} ${rating.text}`;
-
-      $("strongestSection").textContent =
-        strongest ? strongest.name : "—";
-
-      $("strongestScore").textContent =
-        strongest ? `${strongest.score.toFixed(1)}%` : "—";
-
-      $("strongestText").textContent =
-        strongest
-          ? `${strongest.yes} Yes, ${strongest.no} No and ${strongest.na} N/A responses.`
-          : "No applicable criteria were scored.";
-
-      $("weakestSection").textContent =
-        weakest ? weakest.name : "—";
-
-      $("weakestScore").textContent =
-        weakest ? `${weakest.score.toFixed(1)}%` : "—";
-
-      $("weakestText").textContent =
-        weakest
-          ? `${weakest.yes} Yes, ${weakest.no} No and ${weakest.na} N/A responses.`
-          : "No applicable criteria were scored.";
-
-      $("bars").innerHTML = resultSections.map(section => `
+      $("bars").innerHTML=resultSections.map(section=>`
         <div class="bar-row">
           <div class="bar-name">${section.name}</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${section.score === null ? 0 : section.score}%"></div>
-          </div>
-          <div class="bar-score">${section.score === null ? "N/A" : section.score.toFixed(1) + "%"}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${section.score===null?0:section.score}%"></div></div>
+          <div class="bar-score">${section.score===null?"N/A":section.score.toFixed(1)+"%"}</div>
         </div>
       `).join("");
 
-      const strengths = resultSections
-        .filter(section => section.score !== null && section.score >= 90)
-        .sort((a,b) => b.score - a.score);
+      const strengths=resultSections.filter(s=>s.score!==null&&s.score>=90).sort((a,b)=>b.score-a.score);
+      const development=resultSections.filter(s=>s.score!==null&&s.score<85).sort((a,b)=>a.score-b.score);
 
-      const development = resultSections
-        .filter(section => section.score !== null && section.score < 85)
-        .sort((a,b) => a.score - b.score);
+      $("strengthList").innerHTML=strengths.length
+        ? strengths.map(s=>`<li>${s.name} — ${s.score.toFixed(1)}%</li>`).join("")
+        : "<li>No section scored 90% or above. Review the strongest applicable area above.</li>";
 
-      $("strengthList").innerHTML =
-        strengths.length
-          ? strengths.map(section =>
-              `<li>${section.name} — ${section.score.toFixed(1)}%</li>`
-            ).join("")
-          : `<li>No section scored 90% or above. Review the strongest applicable areas above.</li>`;
+      $("developmentList").innerHTML=development.length
+        ? development.map(s=>`<li>${s.name} — ${s.score.toFixed(1)}%</li>`).join("")
+        : "<li>No section is currently below 85%.</li>";
 
-      $("developmentList").innerHTML =
-        development.length
-          ? development.map(section =>
-              `<li>${section.name} — ${section.score.toFixed(1)}%</li>`
-            ).join("")
-          : `<li>No section is currently below 85%.</li>`;
-
-      $("coachingTitle").textContent = coaching[0];
-      $("coachingText").textContent = coaching[1];
+      $("coachingTitle").textContent=coaching[0];
+      $("coachingText").textContent=coaching[1];
 
       $("results").classList.remove("hidden");
 
       window.scrollTo({
-        top: $("results").offsetTop - 20,
+        top:$("results").offsetTop-20,
         behavior:"smooth"
       });
     }
 
-    function escapePdf(text) {
-      return String(text || "").replace(/[^\x20-\x7E]/g, "");
+    function getComment(criterionId){
+      const field=$(criterionId+"_comment");
+      return field ? field.value.trim() : "";
     }
 
-    function addPdfPage(doc) {
-      doc.addPage();
-      return 48;
+    function esc(value){
+      return String(value||"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
     }
 
-    async function exportPDF() {
-      if (!lastResult) {
-        alert("Please generate the observation report before exporting the PDF.");
-        return;
-      }
+    function buildPdfReport(){
+      const overall=getOverallResult();
+      const resultSections=sections.map(getSectionResult);
+      const applicable=resultSections.filter(s=>s.score!==null);
+      const strongest=[...applicable].sort((a,b)=>b.score-a.score)[0];
+      const weakest=[...applicable].sort((a,b)=>a.score-b.score)[0];
+      const rating=getRating(overall.score);
+      const coaching=getCoachingRecommendation(weakest);
 
-      if (typeof html2pdf === "undefined") {
-        alert("PDF export library could not be loaded. Please check your internet connection and refresh the page.");
-        return;
-      }
+      let html=`
+        <div class="pdf-header">
+          <div class="pdf-brand">GG LEARNLABS</div>
+          <div class="pdf-title">Trainer Observation Form</div>
+          <div class="pdf-meta">
+            Trainer: ${esc($("trainerName").value.trim()||"—")}<br>
+            Evaluator: ${esc($("evaluatorName").value.trim()||"—")}<br>
+            Class / Topic: ${esc($("classTopic").value.trim()||"—")}<br>
+            Observation Date: ${esc($("observationDate").value ? formatDate($("observationDate").value) : "—")}
+            ${$("observationTime").value ? ` · Time: ${esc($("observationTime").value)}` : ""}
+            ${$("courseDuration").value ? ` · Duration: ${esc($("courseDuration").value)} mins` : ""}
+          </div>
+        </div>
 
-      saveComments();
+        <div class="pdf-score">
+          <div>
+            <div class="pdf-score-label">Overall Score</div>
+            <div class="pdf-score-value">${overall.score.toFixed(1)}%</div>
+          </div>
+          <div class="pdf-rating">${esc(rating.label)}</div>
+        </div>
 
-      const source = $("results");
-      const clone = source.cloneNode(true);
+        <div class="pdf-box">
+          <div class="pdf-box-title">Overall observation</div>
+          <div class="pdf-box-text">${esc(rating.title)} ${esc(rating.text)}</div>
+        </div>
 
-      clone.removeAttribute("id");
-      clone.classList.remove("hidden");
-      clone.classList.add("pdf-export");
+        <div class="pdf-insights">
+          <div class="pdf-insight green">
+            <div class="pdf-insight-label">Strongest Section</div>
+            <div class="pdf-insight-title">${esc(strongest?.name||"—")}</div>
+            <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1)+"%" : "—"}</div>
+          </div>
+          <div class="pdf-insight amber">
+            <div class="pdf-insight-label">Development Priority</div>
+            <div class="pdf-insight-title">${esc(weakest?.name||"—")}</div>
+            <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1)+"%" : "—"}</div>
+          </div>
+        </div>
+      `;
 
-      /* Remove interactive controls from the PDF copy. */
-      clone.querySelectorAll("button, .footer-actions, #themeToggle").forEach(el => el.remove());
+      resultSections.forEach((section,sectionIndex)=>{
+        html+=`
+          <div class="pdf-section ${sectionIndex===4 ? "pdf-page-break" : ""}">
+            <div class="pdf-section-title">
+              ${esc(section.name)}
+              <span class="pdf-section-score">
+                ${section.score===null ? "N/A" : section.score.toFixed(1)+"%"}
+              </span>
+            </div>
+        `;
 
-      /* Keep the editable text fields but render their values as visible text. */
-      clone.querySelectorAll("textarea").forEach(textarea => {
-        const replacement = document.createElement("div");
-        replacement.className = "pdf-field-value";
-        replacement.textContent = textarea.value.trim() || "—";
-        textarea.replaceWith(replacement);
+        section.criteria.forEach((criterion,index)=>{
+          const id=`${section.id}_${index+1}`;
+          const value=responses[id]||"—";
+          const comment=getComment(id);
+          const cls=value==="Y"?"y":value==="N"?"n":value==="N/A"?"na":"";
+
+          html+=`
+            <div class="pdf-criterion">
+              <div class="pdf-row">
+                <div class="pdf-criterion-name">${esc(criterion)}</div>
+                <div class="pdf-response ${cls}">${esc(value)}</div>
+              </div>
+              ${comment ? `<div class="pdf-comment"><span>Comment:</span> ${esc(comment)}</div>` : ""}
+            </div>
+          `;
+        });
+
+        html+="</div>";
       });
 
-      /* Add a clean PDF-only heading. */
-      const pdfHeader = document.createElement("div");
-      pdfHeader.className = "pdf-header";
-      pdfHeader.innerHTML = `
-        <div class="pdf-brand">GG LEARNLABS</div>
-        <div class="pdf-title">TRAINER OBSERVATION FORM</div>
-        <div class="pdf-subtitle">Observation Report</div>
+      const strengthComments=$("strengthComments").value.trim();
+      const developmentComments=$("developmentComments").value.trim();
+      const actionPlan=$("actionPlan").value.trim();
+      const successMeasure=$("successMeasure").value.trim();
+      const overallComments=$("overallComments").value.trim();
+
+      html+=`
+        <div class="pdf-box">
+          <div class="pdf-box-title">Coaching Recommendation</div>
+          <div class="pdf-box-text"><strong>${esc(coaching[0])}</strong><br>${esc(coaching[1])}</div>
+        </div>
       `;
-      clone.insertBefore(pdfHeader, clone.firstChild);
 
-      const pdfFooter = document.createElement("div");
-      pdfFooter.className = "pdf-footer-note";
-      pdfFooter.textContent = "GG LearnLabs · Trainer Observation Form · Y/N/N/A scoring · N/A excluded from denominator";
-      clone.appendChild(pdfFooter);
+      const optional=[
+        ["Strength Evidence / Comments",strengthComments],
+        ["Development Evidence / Comments",developmentComments],
+        ["Recommended Action",actionPlan],
+        ["Follow-up / Success Measure",successMeasure],
+        ["Final Observer Comments",overallComments]
+      ];
 
-      const holder = document.createElement("div");
-      holder.style.position = "fixed";
-      holder.style.left = "-100000px";
-      holder.style.top = "0";
-      holder.style.width = "794px";
-      holder.style.background = "#ffffff";
-      holder.style.zIndex = "-1";
-      holder.appendChild(clone);
-      document.body.appendChild(holder);
+      optional.forEach(([title,text])=>{
+        if(!text) return;
+        html+=`
+          <div class="pdf-box">
+            <div class="pdf-box-title">${esc(title)}</div>
+            <div class="pdf-box-text">${esc(text).replace(/\n/g,"<br>")}</div>
+          </div>
+        `;
+      });
 
-      try {
-        const fileName = `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`;
+      html+=`
+        <div class="pdf-footer">
+          GG LearnLabs · Trainer Observation Form · Y/N/N/A scoring · N/A excluded from denominator
+        </div>
+      `;
 
-        const options = {
-          margin: [10, 10, 12, 10],
-          filename: fileName,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: "#ffffff",
-            logging: false,
-            scrollX: 0,
-            scrollY: 0
+      $("pdfReport").innerHTML=html;
+    }
+
+    async function ensureHtml2Pdf(){
+      if(typeof window.html2pdf==="function") return true;
+
+      await new Promise(resolve=>{
+        const script=document.createElement("script");
+        script.src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js";
+        script.onload=resolve;
+        script.onerror=resolve;
+        document.head.appendChild(script);
+      });
+
+      return typeof window.html2pdf==="function";
+    }
+
+    async function exportPDF(){
+      const button=$("exportButton");
+      const originalText=button.textContent;
+
+      try{
+        button.disabled=true;
+        button.textContent="Preparing PDF…";
+
+        const loaded=await ensureHtml2Pdf();
+
+        if(!loaded){
+          throw new Error("html2pdf.js could not be loaded.");
+        }
+
+        buildPdfReport();
+
+        const element=$("pdfReport");
+        element.style.display="block";
+
+        /*
+          html2pdf needs a measurable element. The report is temporarily placed
+          off-screen but remains in the document flow for rendering.
+        */
+        const filename=
+          `${safeFileName($("trainerName").value||"trainer")}_TOF_${safeFileName($("classTopic").value||"observation")}.pdf`;
+
+        const options={
+          margin:[12,12,16,12],
+          filename,
+          image:{type:"jpeg",quality:0.98},
+          html2canvas:{
+            scale:2,
+            useCORS:true,
+            allowTaint:false,
+            backgroundColor:"#ffffff",
+            logging:false
           },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-            compress: true
+          jsPDF:{
+            unit:"mm",
+            format:"a4",
+            orientation:"portrait",
+            compress:true
           },
-          pagebreak: {
-            mode: ["css", "legacy"]
+          pagebreak:{
+            mode:["css","legacy"],
+            avoid:[".pdf-section",".pdf-criterion",".pdf-box",".pdf-insight"]
           }
         };
 
-        await html2pdf()
+        await window.html2pdf()
           .set(options)
-          .from(clone)
+          .from(element)
           .save();
 
-      } catch (error) {
-        console.error("TOF PDF export failed:", error);
-        alert("The PDF could not be generated. Please try again.");
-      } finally {
-        holder.remove();
+        button.textContent="PDF Downloaded ✓";
+
+        setTimeout(()=>{
+          button.textContent=originalText;
+          button.disabled=false;
+        },2200);
+
+      }catch(error){
+        console.error("TOF PDF export error:",error);
+
+        button.disabled=false;
+        button.textContent=originalText;
+
+        alert(
+          "The PDF could not be generated. Please refresh the page and try again. If it still fails, check that your browser is connected to the internet because html2pdf.js is loaded from a CDN."
+        );
+
+      }finally{
+        $("pdfReport").style.display="none";
       }
     }
 
-    function safeFileName(value) {
-      return String(value)
+    function safeFileName(value){
+      return String(value||"file")
         .replace(/[^a-z0-9]+/gi,"-")
         .replace(/^-+|-+$/g,"")
-        .toLowerCase();
+        .toLowerCase() || "file";
     }
 
-    function formatDate(value) {
-      const date = new Date(`${value}T00:00:00`);
-      if (Number.isNaN(date.getTime())) return value;
-
-      return date.toLocaleDateString("en-GB", {
+    function formatDate(value){
+      const date=new Date(`${value}T00:00:00`);
+      if(Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString("en-GB",{
         day:"2-digit",
         month:"short",
         year:"numeric"
       });
     }
 
-    function saveComments() {
-      document.querySelectorAll("textarea[id$='_comment']").forEach(textarea => {
-        const criterionId = textarea.id.replace("_comment","");
-        if (responses[criterionId]) {
-          responses[criterionId + "_comment"] = textarea.value;
-        }
-      });
-    }
+    document.addEventListener("click",event=>{
+      const button=event.target.closest(".rating-btn");
+      if(!button) return;
 
-    document.addEventListener("click", event => {
-      const button = event.target.closest(".rating-btn");
+      const id=button.dataset.criterion;
+      const value=button.dataset.value;
 
-      if (!button) return;
+      responses[id]=value;
 
-      const criterionId = button.dataset.criterion;
-      const value = button.dataset.value;
-
-      responses[criterionId] = value;
-
-      updateCriterionButton(criterionId,value);
+      updateCriterionButton(id,value);
       updateProgress();
 
-      const section = sections.find(s =>
-        s.criteria.some((_, index) => `${s.id}_${index + 1}` === criterionId)
+      const section=sections.find(section=>
+        section.criteria.some((_,index)=>`${section.id}_${index+1}`===id)
       );
 
-      if (section) {
-        updateSectionScore(section);
+      if(section){
+        let yes=0,no=0;
+        section.criteria.forEach((_,index)=>{
+          const v=responses[`${section.id}_${index+1}`];
+          if(v==="Y") yes++;
+          if(v==="N") no++;
+        });
+
+        const denominator=yes+no;
+        $(`${section.id}Score`).textContent =
+          denominator
+            ? `${((yes/denominator)*100).toFixed(1)}% · ${yes}/${denominator}`
+            : `0 / ${section.criteria.length}`;
       }
     });
 
-    $("tofForm").addEventListener("submit", event => {
+    $("tofForm").addEventListener("submit",event=>{
       event.preventDefault();
 
-      const total = sections.reduce((sum, section) => sum + section.criteria.length,0);
+      const total=sections.reduce((sum,section)=>sum+section.criteria.length,0);
+      const scored=Object.keys(responses).filter(key=>!key.endsWith("_comment")).length;
 
-      if (Object.keys(responses).length !== total) {
+      if(!$("tofForm").checkValidity()){
+        $("tofForm").reportValidity();
+        return;
+      }
+
+      if(scored!==total){
         alert(`Please rate all ${total} criteria before generating the observation report.`);
         return;
       }
 
-      saveComments();
       renderResults();
     });
 
-    $("editButton").addEventListener("click", () => {
+    $("editButton").addEventListener("click",()=>{
       $("results").classList.add("hidden");
-      window.scrollTo({
-        top:0,
-        behavior:"smooth"
-      });
+      window.scrollTo({top:0,behavior:"smooth"});
     });
 
-    $("exportButton").addEventListener("click", exportPDF);
+    $("exportButton").addEventListener("click",exportPDF);
 
-    $("themeToggle").addEventListener("click", () => {
-      const current =
-        document.documentElement.getAttribute("data-theme") || "dark";
-
-      const next =
-        current === "dark" ? "light" : "dark";
+    $("themeToggle").addEventListener("click",()=>{
+      const current=document.documentElement.getAttribute("data-theme")||"dark";
+      const next=current==="dark"?"light":"dark";
 
       document.documentElement.setAttribute("data-theme",next);
-
       $("themeToggle").setAttribute(
         "aria-label",
-        next === "dark"
-          ? "Switch to light mode"
-          : "Switch to dark mode"
+        next==="dark" ? "Switch to light mode" : "Switch to dark mode"
       );
 
       localStorage.setItem("ggTOFTheme",next);
     });
 
-    function loadTheme() {
-      const saved = localStorage.getItem("ggTOFTheme");
-
+    (function loadTheme(){
+      const saved=localStorage.getItem("ggTOFTheme");
       document.documentElement.setAttribute(
         "data-theme",
-        saved === "light" ? "light" : "dark"
+        saved==="light" ? "light" : "dark"
       );
-    }
+    })();
 
     renderSections();
-    loadTheme();
   </script>
 </body>
 </html>
