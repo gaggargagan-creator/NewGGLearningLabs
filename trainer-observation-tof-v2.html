@@ -203,17 +203,33 @@ body.pdf-exporting{
 }
 
 #pdfReport{
-      position:absolute;
-      left:0;
-      top:0;
-      width:794px;
-      background:#fff;
-      color:#1b2927;
-      padding:42px 48px;
-      font-family:Arial,Helvetica,sans-serif;
       display:none;
-      visibility:hidden;
-      opacity:0;
+      position:relative;
+      width:794px;
+      min-height:1123px;
+      margin:0 auto;
+      padding:42px 48px;
+      background:#ffffff;
+      color:#1b2927;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    body.pdf-exporting{
+      background:#ffffff !important;
+      overflow:hidden !important;
+    }
+
+    body.pdf-exporting > .page{
+      display:none !important;
+    }
+
+    body.pdf-exporting > #pdfReport{
+      display:block !important;
+      position:relative !important;
+      left:auto !important;
+      top:auto !important;
+      visibility:visible !important;
+      opacity:1 !important;
     }
     #pdfReport .pdf-header{border-bottom:2px solid #138f7e;padding-bottom:16px;margin-bottom:20px}
     #pdfReport .pdf-brand{font:bold 13px Arial;color:#138f7e;letter-spacing:1.2px}
@@ -301,7 +317,7 @@ body.pdf-exporting{
       <p>
         A digital version of the existing TOF structure used by the Learning &amp; Development Team.
         Rate each observation point as <strong>Y</strong>, <strong>N</strong> or <strong>N/A</strong>,
-        add evidence in comments, and generate a clear observation report.
+        review the pre-loaded demo observation, add evidence in comments, and generate a clear observation report.
       </p>
     </section>
 
@@ -419,7 +435,7 @@ body.pdf-exporting{
       </div>
     </section>
 
-    <footer>GG LearnLabs · Trainer Observation Form · Based on the Learning &amp; Development Team TOF template</footer>
+    <footer>GG LearnLabs · Trainer Observation Form · Demo data pre-loaded for testing</footer>
   </div>
 
   <!-- Off-screen HTML report used by html2pdf.js -->
@@ -836,23 +852,49 @@ body.pdf-exporting{
     }
 
     async function ensureHtml2Pdf(){
-      if(typeof window.html2pdf==="function") return true;
+      if(typeof window.html2pdf === "function"){
+        return true;
+      }
 
-      await new Promise(resolve=>{
-        const script=document.createElement("script");
-        script.src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js";
-        script.onload=resolve;
-        script.onerror=resolve;
-        document.head.appendChild(script);
-      });
+      const urls = [
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+        "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+      ];
 
-      return typeof window.html2pdf==="function";
+      for(const url of urls){
+        const loaded = await new Promise(resolve => {
+          const script = document.createElement("script");
+          script.src = url;
+          script.async = true;
+
+          let finished = false;
+
+          const done = ok => {
+            if(finished) return;
+            finished = true;
+            resolve(ok);
+          };
+
+          script.onload = () => done(true);
+          script.onerror = () => done(false);
+
+          document.head.appendChild(script);
+
+          setTimeout(() => done(false), 10000);
+        });
+
+        if(loaded && typeof window.html2pdf === "function"){
+          return true;
+        }
+      }
+
+      return false;
     }
 
     async function exportPDF(){
       const button = $("exportButton");
-      const originalText = button.textContent;
       const report = $("pdfReport");
+      const originalText = button.textContent;
 
       try {
         button.disabled = true;
@@ -861,32 +903,43 @@ body.pdf-exporting{
         const loaded = await ensureHtml2Pdf();
 
         if (!loaded || typeof window.html2pdf !== "function") {
-          throw new Error("html2pdf.js could not be loaded.");
+          throw new Error("html2pdf.js failed to load.");
         }
 
         buildPdfReport();
 
-        // html2canvas cannot reliably capture an element positioned far
-        // outside the viewport. Put the report at 0,0 temporarily and hide
-        // the application UI while it is being rendered.
+        /*
+          Critical rendering fix:
+          html2canvas can return a blank canvas when the source element is
+          display:none, visibility:hidden, transparent, or positioned far
+          outside the viewport. The report is therefore rendered normally
+          in the document, while the application itself is temporarily hidden.
+        */
         document.body.classList.add("pdf-exporting");
         report.style.display = "block";
         report.style.visibility = "visible";
         report.style.opacity = "1";
 
+        await new Promise(resolve => setTimeout(resolve, 250));
+
         if (document.fonts && document.fonts.ready) {
-          await document.fonts.ready;
+          try {
+            await document.fonts.ready;
+          } catch (_) {}
         }
 
-        // Let the browser perform one layout/repaint before html2canvas reads it.
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await new Promise(resolve =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+          )
+        );
 
         const filename =
           `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`;
 
         const options = {
-          margin: [10, 10, 14, 10],
-          filename,
+          margin: [8, 8, 12, 8],
+          filename: filename,
           image: {
             type: "jpeg",
             quality: 0.98
@@ -899,7 +952,11 @@ body.pdf-exporting{
             logging: false,
             scrollX: 0,
             scrollY: 0,
-            windowWidth: 794
+            windowWidth: 794,
+            windowHeight: Math.max(
+              1123,
+              report.scrollHeight + 100
+            )
           },
           jsPDF: {
             unit: "mm",
@@ -918,9 +975,17 @@ body.pdf-exporting{
           }
         };
 
+        /*
+          Use the html2pdf worker chain explicitly. This makes the capture,
+          canvas conversion and PDF save stages deterministic.
+        */
         await window.html2pdf()
           .set(options)
           .from(report)
+          .toContainer()
+          .toCanvas()
+          .toImg()
+          .toPdf()
           .save();
 
         button.textContent = "PDF Downloaded ✓";
@@ -1044,7 +1109,173 @@ body.pdf-exporting{
       );
     })();
 
+
+    /* =========================================================
+       DEMO DATA
+       The form opens pre-populated every time for quick testing.
+       This does NOT auto-generate the report; the user still clicks
+       "Generate Observation Report".
+    ========================================================= */
+
+    const DEMO_DATA = {
+      trainerName: "Delaisha Shah",
+      evaluatorName: "Gagan Gaggar",
+      observationDate: "2026-05-26",
+      observationTime: "10:00",
+      classTopic: "US Culture & Communication",
+      courseDuration: "120",
+
+      responses: {
+        classroomReadiness_1: "Y",
+        classroomReadiness_2: "Y",
+        classroomReadiness_3: "Y",
+        classroomReadiness_4: "Y",
+
+        facilitatorReadiness_1: "Y",
+        facilitatorReadiness_2: "Y",
+        facilitatorReadiness_3: "N",
+
+        trainingIntroduction_1: "Y",
+        trainingIntroduction_2: "Y",
+        trainingIntroduction_3: "Y",
+        trainingIntroduction_4: "N",
+
+        facilitationSkills_1: "Y",
+        facilitationSkills_2: "Y",
+        facilitationSkills_3: "Y",
+        facilitationSkills_4: "Y",
+        facilitationSkills_5: "Y",
+        facilitationSkills_6: "Y",
+        facilitationSkills_7: "Y",
+        facilitationSkills_8: "Y",
+        facilitationSkills_9: "Y",
+        facilitationSkills_10: "N",
+        facilitationSkills_11: "Y",
+
+        contentExpertise_1: "Y",
+        contentExpertise_2: "Y",
+        contentExpertise_3: "Y",
+        contentExpertise_4: "Y",
+        contentExpertise_5: "Y",
+
+        classroomManagement_1: "Y",
+        classroomManagement_2: "Y",
+        classroomManagement_3: "Y",
+        classroomManagement_4: "Y",
+        classroomManagement_5: "Y",
+        classroomManagement_6: "N",
+
+        closing_1: "Y",
+        closing_2: "Y",
+        closing_3: "Y"
+      },
+
+      comments: {
+        classroomReadiness_1: "Training equipment and technology were ready before the session.",
+        classroomReadiness_2: "Materials were organised and accessible.",
+        classroomReadiness_3: "Learner name tents were available and displayed.",
+        classroomReadiness_4: "Classroom was professional and organised.",
+
+        facilitatorReadiness_1: "Trainer was present and ready before the session.",
+        facilitatorReadiness_2: "Rapport was established quickly with the learners.",
+        facilitatorReadiness_3: "Session started slightly late.",
+
+        trainingIntroduction_1: "Opening connected well with the learner context.",
+        trainingIntroduction_2: "WIIFM was clearly established.",
+        trainingIntroduction_3: "Learning objectives were communicated clearly.",
+        trainingIntroduction_4: "Additional learner objectives were not explored in depth.",
+
+        facilitationSkills_1: "Voice and tone supported learner attention.",
+        facilitationSkills_2: "Speech rate was generally appropriate.",
+        facilitationSkills_3: "Language was clear and suitable for the audience.",
+        facilitationSkills_4: "Eye contact was consistent.",
+        facilitationSkills_5: "Trainer responded to learner cues effectively.",
+        facilitationSkills_6: "Posture and body language were confident.",
+        facilitationSkills_7: "Gestures and facial expressions supported delivery.",
+        facilitationSkills_8: "Learner questions were answered accurately.",
+        facilitationSkills_9: "Learner interest remained high.",
+        facilitationSkills_10: "A few transitions between topics were abrupt.",
+        facilitationSkills_11: "Key learning points were reinforced.",
+
+        contentExpertise_1: "Facilitator guide and materials were used effectively.",
+        contentExpertise_2: "Planned content was covered.",
+        contentExpertise_3: "Training information was accurate.",
+        contentExpertise_4: "Learning activities were managed effectively.",
+        contentExpertise_5: "Debriefs connected activities back to workplace application.",
+
+        classroomManagement_1: "Trainer was approachable and confident.",
+        classroomManagement_2: "Professional appearance was maintained.",
+        classroomManagement_3: "Handled ambiguity with practical solutions.",
+        classroomManagement_4: "Behaviour concerns were handled appropriately.",
+        classroomManagement_5: "Adult learners were treated respectfully.",
+        classroomManagement_6: "Some small trainer distractions were noticed.",
+
+        closing_1: "Key points and learning gaps were summarised.",
+        closing_2: "Knowledge and skills assessment was completed accurately.",
+        closing_3: "Level 1 feedback was facilitated."
+      },
+
+      extra: {
+        strengthComments: "Strong facilitation presence, clear communication and good learner engagement.",
+        developmentComments: "Focus on smoother topic transitions and tighter control of session start time.",
+        actionPlan: "Use transition statements between major topics and build a five-minute pre-session readiness buffer.",
+        successMeasure: "Review the next observation for session punctuality and seamless transitions.",
+        overallComments: "Overall, the trainer demonstrated a strong and learner-focused delivery. The main opportunities are around punctuality and transitions."
+      }
+    };
+
+    function loadDemoData() {
+      $("trainerName").value = DEMO_DATA.trainerName;
+      $("evaluatorName").value = DEMO_DATA.evaluatorName;
+      $("observationDate").value = DEMO_DATA.observationDate;
+      $("observationTime").value = DEMO_DATA.observationTime;
+      $("classTopic").value = DEMO_DATA.classTopic;
+      $("courseDuration").value = DEMO_DATA.courseDuration;
+
+      Object.entries(DEMO_DATA.responses).forEach(([id, value]) => {
+        responses[id] = value;
+        updateCriterionButton(id, value);
+
+        const section = sections.find(section =>
+          section.criteria.some((_, index) => `${section.id}_${index + 1}` === id)
+        );
+
+        if (section) {
+          let yes = 0;
+          let no = 0;
+
+          section.criteria.forEach((_, index) => {
+            const current = responses[`${section.id}_${index + 1}`];
+            if (current === "Y") yes++;
+            if (current === "N") no++;
+          });
+
+          const denominator = yes + no;
+
+          $(`${section.id}Score`).textContent =
+            denominator
+              ? `${((yes / denominator) * 100).toFixed(1)}% · ${yes}/${denominator}`
+              : `0 / ${section.criteria.length}`;
+        }
+      });
+
+      Object.entries(DEMO_DATA.comments).forEach(([id, value]) => {
+        const field = $(`${id}_comment`);
+        if (field) field.value = value;
+      });
+
+      $("strengthComments").value = DEMO_DATA.extra.strengthComments;
+      $("developmentComments").value = DEMO_DATA.extra.developmentComments;
+      $("actionPlan").value = DEMO_DATA.extra.actionPlan;
+      $("successMeasure").value = DEMO_DATA.extra.successMeasure;
+      $("overallComments").value = DEMO_DATA.extra.overallComments;
+
+      updateProgress();
+    }
+
+
     renderSections();
+    loadDemoData();
   </script>
 </body>
 </html>
