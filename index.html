@@ -30,13 +30,20 @@
     </div>
 
     <div class="topbar-actions">
-      <!-- CSS-only theme toggle: works without changing script.js -->
-      <input class="theme-checkbox" type="checkbox" id="themeToggle" aria-label="Toggle light mode">
-      <label class="theme-switch" for="themeToggle" title="Toggle light / dark mode">
-        <span class="theme-icon sun">☀</span>
-        <span class="theme-track"><span class="theme-thumb"></span></span>
-        <span class="theme-icon moon">☾</span>
-      </label>
+      <button
+        type="button"
+        class="theme-toggle"
+        id="themeToggle"
+        aria-label="Toggle light and dark mode"
+        aria-pressed="false"
+        title="Toggle light / dark mode"
+      >
+        <span class="theme-icon sun" aria-hidden="true">☀</span>
+        <span class="theme-track" aria-hidden="true">
+          <span class="theme-thumb"></span>
+        </span>
+        <span class="theme-icon moon" aria-hidden="true">☾</span>
+      </button>
 
       <button class="ghost" id="howItWorks">
         How it works
@@ -134,17 +141,14 @@
           <div class="section-intro">
             <div class="eyebrow">EFFECTIVENESS MEASURES</div>
             <h2>How did the training perform?</h2>
-            <p>
-              Score each measure from 0 to 100.
-              The weighted contribution is calculated automatically.
-            </p>
+            <p>Score each measure from 0 to 100. The weighted contribution is calculated automatically.</p>
           </div>
 
           <div id="measureCards" class="measure-cards"></div>
 
           <div class="actions">
             <button type="button" class="ghost" id="backToStep1">← Back</button>
-            <button type="submit" class="primary">
+            <button type="submit" class="primary" id="generateAssessment">
               Generate Assessment <span>→</span>
             </button>
           </div>
@@ -223,13 +227,13 @@
 
         <div id="methodContent" class="method-content">
           <p><b>Overall Effectiveness</b> is a weighted score based on:</p>
-
           <div class="formula">
-            Trainer Observation × 35% + Participant Feedback × 20% +
-            Knowledge Assessment × 15% + Learning Application × 20% +
-            Attendance / Completion × 10%
+            Trainer Observation × 35%
+            + Participant Feedback × 20%
+            + Knowledge Assessment × 15%
+            + Learning Application × 20%
+            + Attendance / Completion × 10%
           </div>
-
           <p>
             The final rating also considers critical thresholds for
             overall performance, trainer observation and learning application.
@@ -240,9 +244,7 @@
       <!-- ACTIONS -->
       <div class="report-actions">
         <button class="ghost" id="editAssessment">← Edit Assessment</button>
-        <button class="primary" id="exportPDF">
-          Export Report as PDF <span>↓</span>
-        </button>
+        <button class="primary" id="exportPDF">Export Report as PDF <span>↓</span></button>
       </div>
     </section>
   </main>
@@ -254,5 +256,29 @@
   <div id="toast" class="toast"></div>
 
   <script src="script.js"></script>
+
+  <!-- Theme control kept separate so existing assessment/report logic remains untouched -->
+  <script>
+    (function () {
+      const toggle = document.getElementById("themeToggle");
+      const root = document.documentElement;
+      const savedTheme = localStorage.getItem("gg-theme");
+
+      function setTheme(theme) {
+        const isLight = theme === "light";
+        root.setAttribute("data-theme", isLight ? "light" : "dark");
+        toggle.setAttribute("aria-pressed", String(isLight));
+        toggle.title = isLight ? "Switch to dark mode" : "Switch to light mode";
+        localStorage.setItem("gg-theme", isLight ? "light" : "dark");
+      }
+
+      setTheme(savedTheme === "light" ? "light" : "dark");
+
+      toggle.addEventListener("click", function () {
+        const current = root.getAttribute("data-theme");
+        setTheme(current === "light" ? "dark" : "light");
+      });
+    })();
+  </script>
 </body>
 </html>
