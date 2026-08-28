@@ -192,82 +192,424 @@
     .hidden{display:none!important}
     footer{padding:30px 0 0;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}
 
-    /* PDF template */
-    body.pdf-exporting .page,
-body.pdf-exporting .grid{
-      visibility:hidden !important;
-}
+    /* =========================================================
+       ONE-PAGE PDF REPORT
+       Fixed A4 ratio: 794 x 1123 CSS px
+       Designed as an executive L&D infographic.
+    ========================================================= */
 
-body.pdf-exporting{
-      overflow:hidden !important;
-}
-
-#pdfReport{
+    #pdfReport{
       display:none;
       position:relative;
       width:794px;
-      min-height:1123px;
-      margin:0 auto;
-      padding:42px 48px;
-      background:#ffffff;
-      color:#1b2927;
+      height:1123px;
+      margin:0;
+      padding:0;
+      overflow:hidden;
+      background:#f8fbfa;
+      color:#182725;
       font-family:Arial,Helvetica,sans-serif;
     }
 
-    body.pdf-exporting{
-      background:#ffffff !important;
-      overflow:hidden !important;
-    }
-
-    body.pdf-exporting > .page{
+    body.pdf-exporting > .page,
+    body.pdf-exporting > .grid{
       display:none !important;
     }
 
     body.pdf-exporting > #pdfReport{
       display:block !important;
-      position:relative !important;
-      left:auto !important;
-      top:auto !important;
-      visibility:visible !important;
-      opacity:1 !important;
     }
-    #pdfReport .pdf-header{border-bottom:2px solid #138f7e;padding-bottom:16px;margin-bottom:20px}
-    #pdfReport .pdf-brand{font:bold 13px Arial;color:#138f7e;letter-spacing:1.2px}
-    #pdfReport .pdf-title{font:bold 25px Arial;color:#1b2927;margin-top:6px}
-    #pdfReport .pdf-meta{font:11px Arial;color:#647571;line-height:1.6;margin-top:8px}
-    #pdfReport .pdf-score{
-      display:flex;justify-content:space-between;align-items:center;
-      background:#f0f8f6;border:1px solid #d6e6e1;border-radius:12px;padding:18px;margin:18px 0 22px
+
+    .pdf-onepage{
+      width:794px;
+      height:1123px;
+      padding:34px 36px 28px;
+      display:flex;
+      flex-direction:column;
+      background:
+        radial-gradient(circle at 8% 0%,#e8f6f2,transparent 25%),
+        radial-gradient(circle at 98% 8%,#fff2dd,transparent 23%),
+        #f8fbfa;
     }
-    #pdfReport .pdf-score-label{font:bold 10px Arial;color:#138f7e;text-transform:uppercase;letter-spacing:1px}
-    #pdfReport .pdf-score-value{font:bold 34px Arial;color:#1b2927;margin-top:7px}
-    #pdfReport .pdf-rating{font:bold 11px Arial;color:#138f7e}
-    #pdfReport .pdf-section{page-break-inside:avoid;margin:0 0 20px}
-    #pdfReport .pdf-section-title{font:bold 15px Arial;color:#1b2927;border-bottom:1px solid #dce5e2;padding-bottom:7px;margin-bottom:9px}
-    #pdfReport .pdf-section-score{font:10px Arial;color:#138f7e;margin-left:5px}
-    #pdfReport .pdf-criterion{page-break-inside:avoid;border:1px solid #dfe7e4;border-radius:8px;padding:9px 10px;margin:6px 0}
-    #pdfReport .pdf-row{display:grid;grid-template-columns:1fr 78px;gap:10px;align-items:start}
-    #pdfReport .pdf-criterion-name{font:bold 9.5px/1.4 Arial;color:#253532}
-    #pdfReport .pdf-response{text-align:right;font:bold 9px Arial}
-    #pdfReport .pdf-response.y{color:#138f7e}
-    #pdfReport .pdf-response.n{color:#c85959}
-    #pdfReport .pdf-response.na{color:#71817e}
-    #pdfReport .pdf-comment{margin-top:6px;font:8.5px/1.45 Arial;color:#647571}
-    #pdfReport .pdf-comment span{font-weight:bold;color:#334542}
-    #pdfReport .pdf-insights{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
-    #pdfReport .pdf-insight{border-radius:10px;padding:13px;border:1px solid #dce5e2}
-    #pdfReport .pdf-insight.green{background:#f1faf7}
-    #pdfReport .pdf-insight.amber{background:#fff8ee}
-    #pdfReport .pdf-insight-label{font:bold 8px Arial;letter-spacing:1px}
-    #pdfReport .pdf-insight.green .pdf-insight-label{color:#138f7e}
-    #pdfReport .pdf-insight.amber .pdf-insight-label{color:#c98518}
-    #pdfReport .pdf-insight-title{font:bold 12px Arial;color:#1b2927;margin-top:7px}
-    #pdfReport .pdf-insight-score{font:bold 19px Arial;color:#138f7e;margin-top:4px}
-    #pdfReport .pdf-box{page-break-inside:avoid;border:1px solid #dce5e2;border-radius:10px;padding:14px;margin-top:14px}
-    #pdfReport .pdf-box-title{font:bold 9px Arial;color:#138f7e;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
-    #pdfReport .pdf-box-text{font:9.5px/1.55 Arial;color:#4f625e}
-    #pdfReport .pdf-footer{border-top:1px solid #dce5e2;margin-top:22px;padding-top:8px;font:8px Arial;color:#7a8986}
-    .pdf-page-break{page-break-before:always}
+
+    .pdf-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding-bottom:14px;
+      border-bottom:2px solid #178f7f;
+    }
+
+    .pdf-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .pdf-brand img{
+      width:126px;
+      height:40px;
+      object-fit:contain;
+      object-position:left center;
+    }
+
+    .pdf-kicker{
+      font:bold 9px Arial,sans-serif;
+      color:#178f7f;
+      letter-spacing:1.6px;
+      text-transform:uppercase;
+    }
+
+    .pdf-title{
+      margin-top:3px;
+      font:bold 23px Arial,sans-serif;
+      color:#182725;
+    }
+
+    .pdf-date{
+      text-align:right;
+      font:10px/1.55 Arial,sans-serif;
+      color:#6a7b77;
+    }
+
+    .pdf-meta-strip{
+      display:grid;
+      grid-template-columns:1.25fr 1.25fr 1fr 1fr;
+      gap:9px;
+      margin-top:12px;
+    }
+
+    .pdf-meta-box{
+      background:#fff;
+      border:1px solid #dce6e3;
+      border-radius:10px;
+      padding:9px 10px;
+      min-height:42px;
+    }
+
+    .pdf-meta-label{
+      font:bold 7px Arial,sans-serif;
+      color:#178f7f;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .pdf-meta-value{
+      margin-top:3px;
+      font:bold 10px Arial,sans-serif;
+      color:#21322f;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .pdf-hero{
+      display:grid;
+      grid-template-columns:190px 1fr;
+      gap:18px;
+      margin-top:13px;
+    }
+
+    .pdf-score-card{
+      border-radius:14px;
+      padding:16px;
+      background:#173a35;
+      color:#fff;
+      min-height:148px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .pdf-score-card::after{
+      content:"";
+      position:absolute;
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      right:-48px;
+      top:-48px;
+      background:rgba(85,223,199,.12);
+    }
+
+    .pdf-score-label{
+      font:bold 8px Arial,sans-serif;
+      letter-spacing:1.2px;
+      color:#7ee8d6;
+    }
+
+    .pdf-score-number{
+      font:bold 45px Arial,sans-serif;
+      margin-top:9px;
+      letter-spacing:-1.5px;
+    }
+
+    .pdf-score-sub{
+      font:9px/1.45 Arial,sans-serif;
+      color:#cfe2de;
+      margin-top:5px;
+    }
+
+    .pdf-score-pill{
+      display:inline-block;
+      margin-top:11px;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#55dfc7;
+      color:#06201c;
+      font:bold 8px Arial,sans-serif;
+      letter-spacing:.8px;
+    }
+
+    .pdf-summary-card{
+      background:#fff;
+      border:1px solid #dce6e3;
+      border-radius:14px;
+      padding:15px 16px;
+      min-height:148px;
+    }
+
+    .pdf-summary-label{
+      font:bold 8px Arial,sans-serif;
+      color:#178f7f;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .pdf-summary-title{
+      font:bold 18px Arial,sans-serif;
+      color:#1c2d2a;
+      margin-top:5px;
+    }
+
+    .pdf-summary-text{
+      font:9.5px/1.55 Arial,sans-serif;
+      color:#5d6d69;
+      margin-top:7px;
+    }
+
+    .pdf-stat-row{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .pdf-stat{
+      background:#f3f8f6;
+      border-radius:9px;
+      padding:8px;
+    }
+
+    .pdf-stat-value{
+      font:bold 15px Arial,sans-serif;
+      color:#178f7f;
+    }
+
+    .pdf-stat-label{
+      font:7px Arial,sans-serif;
+      color:#71817e;
+      margin-top:3px;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+
+    .pdf-section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      margin-top:14px;
+      padding-bottom:7px;
+      border-bottom:1px solid #dce6e3;
+    }
+
+    .pdf-section-title strong{
+      font:bold 12px Arial,sans-serif;
+      color:#1c2d2a;
+    }
+
+    .pdf-section-title span{
+      font:8px Arial,sans-serif;
+      color:#71817e;
+    }
+
+    .pdf-bars{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      column-gap:22px;
+      row-gap:8px;
+      margin-top:10px;
+    }
+
+    .pdf-bar-item{
+      display:grid;
+      grid-template-columns:118px 1fr 42px;
+      gap:7px;
+      align-items:center;
+    }
+
+    .pdf-bar-name{
+      font:bold 7.5px Arial,sans-serif;
+      color:#334541;
+      line-height:1.25;
+    }
+
+    .pdf-bar-track{
+      height:7px;
+      background:#e2eae7;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .pdf-bar-fill{
+      height:100%;
+      background:#178f7f;
+      border-radius:inherit;
+    }
+
+    .pdf-bar-value{
+      text-align:right;
+      font:bold 8px Arial,sans-serif;
+      color:#1c2d2a;
+    }
+
+    .pdf-insight-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:9px;
+      margin-top:13px;
+    }
+
+    .pdf-insight{
+      border-radius:12px;
+      padding:11px 12px;
+      border:1px solid #dce6e3;
+      background:#fff;
+      min-height:83px;
+    }
+
+    .pdf-insight.green{background:#effaf6}
+    .pdf-insight.amber{background:#fff7eb}
+    .pdf-insight.blue{background:#f0f6fe}
+
+    .pdf-insight-label{
+      font:bold 7px Arial,sans-serif;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+    }
+
+    .pdf-insight.green .pdf-insight-label{color:#178f7f}
+    .pdf-insight.amber .pdf-insight-label{color:#c98518}
+    .pdf-insight.blue .pdf-insight-label{color:#4778ba}
+
+    .pdf-insight-title{
+      margin-top:6px;
+      font:bold 10px/1.3 Arial,sans-serif;
+      color:#243532;
+    }
+
+    .pdf-insight-score{
+      margin-top:4px;
+      font:bold 17px Arial,sans-serif;
+    }
+
+    .pdf-insight.green .pdf-insight-score{color:#178f7f}
+    .pdf-insight.amber .pdf-insight-score{color:#c98518}
+    .pdf-insight.blue .pdf-insight-score{color:#4778ba}
+
+    .pdf-bottom-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:12px;
+      margin-top:13px;
+    }
+
+    .pdf-box{
+      border:1px solid #dce6e3;
+      border-radius:12px;
+      background:#fff;
+      padding:12px 13px;
+      min-height:127px;
+    }
+
+    .pdf-box-title{
+      font:bold 8px Arial,sans-serif;
+      color:#178f7f;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .pdf-list{
+      margin:8px 0 0 15px;
+      padding:0;
+      font:8.5px/1.55 Arial,sans-serif;
+      color:#566662;
+    }
+
+    .pdf-list li{margin-bottom:3px}
+
+    .pdf-coaching{
+      margin-top:12px;
+      border-radius:12px;
+      padding:13px 14px;
+      background:#173a35;
+      color:#fff;
+    }
+
+    .pdf-coaching-title{
+      font:bold 8px Arial,sans-serif;
+      color:#7ee8d6;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .pdf-coaching-heading{
+      font:bold 13px Arial,sans-serif;
+      margin-top:5px;
+    }
+
+    .pdf-coaching-text{
+      font:8.5px/1.55 Arial,sans-serif;
+      color:#d6e8e4;
+      margin-top:4px;
+    }
+
+    .pdf-notes-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:9px;
+      margin-top:10px;
+    }
+
+    .pdf-note{
+      background:#fff;
+      border:1px solid #dce6e3;
+      border-radius:10px;
+      padding:9px 10px;
+      min-height:64px;
+    }
+
+    .pdf-note-title{
+      font:bold 7px Arial,sans-serif;
+      color:#647571;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+    }
+
+    .pdf-note-text{
+      margin-top:4px;
+      font:7.7px/1.45 Arial,sans-serif;
+      color:#4f625e;
+    }
+
+    .pdf-footer{
+      margin-top:auto;
+      padding-top:9px;
+      border-top:1px solid #dce6e3;
+      display:flex;
+      justify-content:space-between;
+      font:7px Arial,sans-serif;
+      color:#7a8986;
+    }
 
     @media(max-width:900px){
       .criterion{grid-template-columns:1fr}
@@ -731,124 +1073,185 @@ body.pdf-exporting{
     }
 
     function buildPdfReport(){
-      const overall=getOverallResult();
-      const resultSections=sections.map(getSectionResult);
-      const applicable=resultSections.filter(s=>s.score!==null);
-      const strongest=[...applicable].sort((a,b)=>b.score-a.score)[0];
-      const weakest=[...applicable].sort((a,b)=>a.score-b.score)[0];
-      const rating=getRating(overall.score);
-      const coaching=getCoachingRecommendation(weakest);
+      const overall = getOverallResult();
+      const resultSections = sections.map(getSectionResult);
+      const applicable = resultSections.filter(s => s.score !== null);
+      const strongest = [...applicable].sort((a,b)=>b.score-a.score)[0];
+      const weakest = [...applicable].sort((a,b)=>a.score-b.score)[0];
+      const rating = getRating(overall.score);
+      const coaching = getCoachingRecommendation(weakest);
 
-      let html=`
-        <div class="pdf-header">
-          <div class="pdf-brand">GG LEARNLABS</div>
-          <div class="pdf-title">Trainer Observation Form</div>
-          <div class="pdf-meta">
-            Trainer: ${esc($("trainerName").value.trim()||"—")}<br>
-            Evaluator: ${esc($("evaluatorName").value.trim()||"—")}<br>
-            Class / Topic: ${esc($("classTopic").value.trim()||"—")}<br>
-            Observation Date: ${esc($("observationDate").value ? formatDate($("observationDate").value) : "—")}
-            ${$("observationTime").value ? ` · Time: ${esc($("observationTime").value)}` : ""}
-            ${$("courseDuration").value ? ` · Duration: ${esc($("courseDuration").value)} mins` : ""}
+      const strongCount = resultSections.filter(s => s.score !== null && s.score >= 90).length;
+      const focusCount = resultSections.filter(s => s.score !== null && s.score < 85).length;
+
+      const scoreColor =
+        overall.score >= 90 ? "#178f7f" :
+        overall.score >= 80 ? "#178f7f" :
+        overall.score >= 70 ? "#c98518" : "#c75a5a";
+
+      const sectionBars = resultSections.map(section => `
+        <div class="pdf-bar-item">
+          <div class="pdf-bar-name">${esc(section.name.replace(/^[0-9.]+\\s*/, ""))}</div>
+          <div class="pdf-bar-track">
+            <div class="pdf-bar-fill" style="width:${section.score === null ? 0 : section.score}%;background:${section.score !== null && section.score < 70 ? "#c75a5a" : section.score !== null && section.score < 85 ? "#c98518" : "#178f7f"}"></div>
           </div>
+          <div class="pdf-bar-value">${section.score === null ? "N/A" : section.score.toFixed(1) + "%"}</div>
         </div>
+      `).join("");
 
-        <div class="pdf-score">
-          <div>
-            <div class="pdf-score-label">Overall Score</div>
-            <div class="pdf-score-value">${overall.score.toFixed(1)}%</div>
-          </div>
-          <div class="pdf-rating">${esc(rating.label)}</div>
+      const strengthItems = resultSections
+        .filter(s => s.score !== null && s.score >= 90)
+        .sort((a,b)=>b.score-a.score)
+        .slice(0,3);
+
+      const developmentItems = resultSections
+        .filter(s => s.score !== null && s.score < 85)
+        .sort((a,b)=>a.score-b.score)
+        .slice(0,3);
+
+      const strengthList = strengthItems.length
+        ? strengthItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+        : "<li>No section crossed the 90% strength threshold.</li>";
+
+      const developmentList = developmentItems.length
+        ? developmentItems.map(s=>`<li>${esc(s.name.replace(/^[0-9.]+\\s*/,""))} — ${s.score.toFixed(1)}%</li>`).join("")
+        : "<li>No section is below the 85% development threshold.</li>";
+
+      const notes = [
+        ["Strength Evidence", $("strengthComments").value.trim()],
+        ["Development Evidence", $("developmentComments").value.trim()],
+        ["Final Observer Comments", $("overallComments").value.trim()]
+      ].filter(([,text]) => text);
+
+      const noteBlocks = notes.slice(0,3).map(([title,text]) => `
+        <div class="pdf-note">
+          <div class="pdf-note-title">${esc(title)}</div>
+          <div class="pdf-note-text">${esc(text).replace(/\n/g,"<br>")}</div>
         </div>
+      `).join("");
 
-        <div class="pdf-box">
-          <div class="pdf-box-title">Overall observation</div>
-          <div class="pdf-box-text">${esc(rating.title)} ${esc(rating.text)}</div>
-        </div>
+      $("pdfReport").innerHTML = `
+        <div class="pdf-onepage">
 
-        <div class="pdf-insights">
-          <div class="pdf-insight green">
-            <div class="pdf-insight-label">Strongest Section</div>
-            <div class="pdf-insight-title">${esc(strongest?.name||"—")}</div>
-            <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1)+"%" : "—"}</div>
-          </div>
-          <div class="pdf-insight amber">
-            <div class="pdf-insight-label">Development Priority</div>
-            <div class="pdf-insight-title">${esc(weakest?.name||"—")}</div>
-            <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1)+"%" : "—"}</div>
-          </div>
-        </div>
-      `;
-
-      resultSections.forEach((section,sectionIndex)=>{
-        html+=`
-          <div class="pdf-section ${sectionIndex===4 ? "pdf-page-break" : ""}">
-            <div class="pdf-section-title">
-              ${esc(section.name)}
-              <span class="pdf-section-score">
-                ${section.score===null ? "N/A" : section.score.toFixed(1)+"%"}
-              </span>
-            </div>
-        `;
-
-        section.criteria.forEach((criterion,index)=>{
-          const id=`${section.id}_${index+1}`;
-          const value=responses[id]||"—";
-          const comment=getComment(id);
-          const cls=value==="Y"?"y":value==="N"?"n":value==="N/A"?"na":"";
-
-          html+=`
-            <div class="pdf-criterion">
-              <div class="pdf-row">
-                <div class="pdf-criterion-name">${esc(criterion)}</div>
-                <div class="pdf-response ${cls}">${esc(value)}</div>
+          <div class="pdf-header">
+            <div class="pdf-brand">
+              <img src="logo.png" alt="GG LearnLabs">
+              <div>
+                <div class="pdf-kicker">Learning &amp; Development</div>
+                <div class="pdf-title">Trainer Observation Report</div>
               </div>
-              ${comment ? `<div class="pdf-comment"><span>Comment:</span> ${esc(comment)}</div>` : ""}
             </div>
-          `;
-        });
 
-        html+="</div>";
-      });
-
-      const strengthComments=$("strengthComments").value.trim();
-      const developmentComments=$("developmentComments").value.trim();
-      const actionPlan=$("actionPlan").value.trim();
-      const successMeasure=$("successMeasure").value.trim();
-      const overallComments=$("overallComments").value.trim();
-
-      html+=`
-        <div class="pdf-box">
-          <div class="pdf-box-title">Coaching Recommendation</div>
-          <div class="pdf-box-text"><strong>${esc(coaching[0])}</strong><br>${esc(coaching[1])}</div>
-        </div>
-      `;
-
-      const optional=[
-        ["Strength Evidence / Comments",strengthComments],
-        ["Development Evidence / Comments",developmentComments],
-        ["Recommended Action",actionPlan],
-        ["Follow-up / Success Measure",successMeasure],
-        ["Final Observer Comments",overallComments]
-      ];
-
-      optional.forEach(([title,text])=>{
-        if(!text) return;
-        html+=`
-          <div class="pdf-box">
-            <div class="pdf-box-title">${esc(title)}</div>
-            <div class="pdf-box-text">${esc(text).replace(/\n/g,"<br>")}</div>
+            <div class="pdf-date">
+              <strong>${esc($("observationDate").value ? formatDate($("observationDate").value) : "Observation")}</strong><br>
+              ${$("observationTime").value ? esc($("observationTime").value) + " · " : ""}
+              ${$("courseDuration").value ? esc($("courseDuration").value) + " mins" : ""}
+            </div>
           </div>
-        `;
-      });
 
-      html+=`
-        <div class="pdf-footer">
-          GG LearnLabs · Trainer Observation Form · Y/N/N/A scoring · N/A excluded from denominator
+          <div class="pdf-meta-strip">
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Trainer</div>
+              <div class="pdf-meta-value">${esc($("trainerName").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Evaluator</div>
+              <div class="pdf-meta-value">${esc($("evaluatorName").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Class / Topic</div>
+              <div class="pdf-meta-value">${esc($("classTopic").value.trim() || "—")}</div>
+            </div>
+            <div class="pdf-meta-box">
+              <div class="pdf-meta-label">Criteria</div>
+              <div class="pdf-meta-value">36 observation points</div>
+            </div>
+          </div>
+
+          <div class="pdf-hero">
+            <div class="pdf-score-card">
+              <div class="pdf-score-label">OVERALL TOF SCORE</div>
+              <div class="pdf-score-number">${overall.score.toFixed(1)}%</div>
+              <div class="pdf-score-sub">${overall.yes} Yes · ${overall.no} No · ${overall.na} N/A</div>
+              <div class="pdf-score-pill" style="background:${scoreColor}">${esc(rating.label)}</div>
+            </div>
+
+            <div class="pdf-summary-card">
+              <div class="pdf-summary-label">Executive Readout</div>
+              <div class="pdf-summary-title">${esc(rating.title)}</div>
+              <div class="pdf-summary-text">${esc(rating.text)}</div>
+
+              <div class="pdf-stat-row">
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${strongCount}/7</div>
+                  <div class="pdf-stat-label">Strong Sections</div>
+                </div>
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${focusCount}</div>
+                  <div class="pdf-stat-label">Focus Sections</div>
+                </div>
+                <div class="pdf-stat">
+                  <div class="pdf-stat-value">${overall.denominator ? ((overall.yes/overall.denominator)*100).toFixed(0) : 0}%</div>
+                  <div class="pdf-stat-label">Applicable Y Rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pdf-section-title">
+            <strong>Section Performance Profile</strong>
+            <span>Y / (Y + N) · N/A excluded</span>
+          </div>
+
+          <div class="pdf-bars">${sectionBars}</div>
+
+          <div class="pdf-insight-grid">
+            <div class="pdf-insight green">
+              <div class="pdf-insight-label">Strongest Section</div>
+              <div class="pdf-insight-title">${esc((strongest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-score">${strongest ? strongest.score.toFixed(1) + "%" : "—"}</div>
+            </div>
+
+            <div class="pdf-insight amber">
+              <div class="pdf-insight-label">Development Priority</div>
+              <div class="pdf-insight-title">${esc((weakest?.name||"—").replace(/^[0-9.]+\\s*/,""))}</div>
+              <div class="pdf-insight-score">${weakest ? weakest.score.toFixed(1) + "%" : "—"}</div>
+            </div>
+
+            <div class="pdf-insight blue">
+              <div class="pdf-insight-label">Observation Coverage</div>
+              <div class="pdf-insight-title">${overall.denominator} applicable criteria scored</div>
+              <div class="pdf-insight-score">${overall.na} N/A</div>
+            </div>
+          </div>
+
+          <div class="pdf-bottom-grid">
+            <div class="pdf-box">
+              <div class="pdf-box-title">Observed Strengths</div>
+              <ul class="pdf-list">${strengthList}</ul>
+            </div>
+
+            <div class="pdf-box">
+              <div class="pdf-box-title">Development Focus</div>
+              <ul class="pdf-list">${developmentList}</ul>
+            </div>
+          </div>
+
+          <div class="pdf-coaching">
+            <div class="pdf-coaching-title">Coaching Recommendation</div>
+            <div class="pdf-coaching-heading">${esc(coaching[0])}</div>
+            <div class="pdf-coaching-text">${esc(coaching[1])}</div>
+          </div>
+
+          ${notes.length ? `<div class="pdf-notes-grid">${noteBlocks}</div>` : ""}
+
+          <div class="pdf-footer">
+            <span>GG LearnLabs · Trainer Observation Form</span>
+            <span>Y = positive · N = negative · N/A = excluded</span>
+          </div>
+
         </div>
       `;
-
-      $("pdfReport").innerHTML=html;
     }
 
     async function ensureHtml2Pdf(){
@@ -896,36 +1299,25 @@ body.pdf-exporting{
       const report = $("pdfReport");
       const originalText = button.textContent;
 
-      try {
+      try{
         button.disabled = true;
-        button.textContent = "Preparing PDF...";
+        button.textContent = "Preparing 1-page PDF...";
 
         const loaded = await ensureHtml2Pdf();
 
-        if (!loaded || typeof window.html2pdf !== "function") {
-          throw new Error("html2pdf.js failed to load.");
+        if(!loaded || typeof window.html2pdf !== "function"){
+          throw new Error("html2pdf.js could not be loaded.");
         }
 
         buildPdfReport();
 
-        /*
-          Critical rendering fix:
-          html2canvas can return a blank canvas when the source element is
-          display:none, visibility:hidden, transparent, or positioned far
-          outside the viewport. The report is therefore rendered normally
-          in the document, while the application itself is temporarily hidden.
-        */
         document.body.classList.add("pdf-exporting");
         report.style.display = "block";
-        report.style.visibility = "visible";
-        report.style.opacity = "1";
 
         await new Promise(resolve => setTimeout(resolve, 250));
 
-        if (document.fonts && document.fonts.ready) {
-          try {
-            await document.fonts.ready;
-          } catch (_) {}
+        if(document.fonts && document.fonts.ready){
+          try{ await document.fonts.ready; }catch(_){}
         }
 
         await new Promise(resolve =>
@@ -935,68 +1327,61 @@ body.pdf-exporting{
         );
 
         const filename =
-          `${safeFileName($("trainerName").value || "trainer")}_TOF_${safeFileName($("classTopic").value || "observation")}.pdf`;
+          `${safeFileName($("trainerName").value || "trainer")}_TOF_one-page_${safeFileName($("classTopic").value || "observation")}.pdf`;
 
-        const options = {
-          margin: [8, 8, 12, 8],
-          filename: filename,
-          image: {
-            type: "jpeg",
-            quality: 0.98
-          },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: "#ffffff",
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: 794,
-            windowHeight: Math.max(
-              1123,
-              report.scrollHeight + 100
-            )
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-            compress: true
-          },
-          pagebreak: {
-            mode: ["css", "legacy"],
-            avoid: [
-              ".pdf-section",
-              ".pdf-criterion",
-              ".pdf-box",
-              ".pdf-insight"
-            ]
-          }
-        };
-
-        /*
-          Use the html2pdf worker chain explicitly. This makes the capture,
-          canvas conversion and PDF save stages deterministic.
-        */
         await window.html2pdf()
-          .set(options)
+          .set({
+            margin: 0,
+            filename,
+            image: {
+              type: "jpeg",
+              quality: 0.98
+            },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              allowTaint: false,
+              backgroundColor: "#f8fbfa",
+              logging: false,
+              scrollX: 0,
+              scrollY: 0,
+              width: 794,
+              height: 1123,
+              windowWidth: 794,
+              windowHeight: 1123
+            },
+            jsPDF: {
+              unit: "mm",
+              format: "a4",
+              orientation: "portrait",
+              compress: true
+            },
+            pagebreak: {
+              mode: ["avoid-all"]
+            }
+          })
           .from(report)
-          .toContainer()
-          .toCanvas()
-          .toImg()
           .toPdf()
+          .get("pdf")
+          .then(pdf => {
+            // Force a true one-page A4 output by replacing any accidental
+            // extra pages with the intended first rendered page.
+            while(pdf.internal.getNumberOfPages() > 1){
+              pdf.deletePage(pdf.internal.getNumberOfPages());
+            }
+            return pdf;
+          })
           .save();
 
-        button.textContent = "PDF Downloaded ✓";
+        button.textContent = "1-page PDF Downloaded ✓";
 
-        setTimeout(() => {
+        setTimeout(()=>{
           button.textContent = originalText;
           button.disabled = false;
-        }, 2200);
+        },2200);
 
-      } catch (error) {
-        console.error("TOF PDF export error:", error);
+      }catch(error){
+        console.error("TOF PDF export error:",error);
 
         button.textContent = originalText;
         button.disabled = false;
@@ -1005,11 +1390,9 @@ body.pdf-exporting{
           "The PDF could not be generated. Please refresh the page and try again."
         );
 
-      } finally {
+      }finally{
         document.body.classList.remove("pdf-exporting");
         report.style.display = "none";
-        report.style.visibility = "hidden";
-        report.style.opacity = "0";
       }
     }
 
