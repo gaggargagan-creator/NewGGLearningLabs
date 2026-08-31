@@ -117,16 +117,158 @@ function buildPdf(){
 async function exportPdf(){
  const b=$("export"),orig=b.textContent;
  try{
-  b.disabled=true;b.textContent="Preparing 1-page PDF...";
-  if(!(await loadScript(["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js","https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"],()=>typeof window.html2canvas==="function")))throw Error("PDF renderer could not be loaded.");
-  if(!(await loadScript(["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js","https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"],()=>window.jspdf&&typeof window.jspdf.jsPDF==="function")))throw Error("PDF generator could not be loaded.");
-  buildPdf();const r=$("pdf");r.style.display="block";await new Promise(x=>setTimeout(x,250));
-  const canvas=await html2canvas(r,{scale:2,width:794,height:1123,windowWidth:794,windowHeight:1123,backgroundColor:"#f8fbfa",useCORS:false,logging:false});
-  const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});pdf.addImage(canvas.toDataURL("image/jpeg",.98),"JPEG",0,0,210,297,undefined,"FAST");
-  const blob=pdf.output("blob"),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="L&D_Action_Plan_"+safe(p.title)+".pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  b.textContent="Report Downloaded ✓";setTimeout(()=>{b.textContent=orig;b.disabled=false},2000);
- }catch(e){console.error(e);b.textContent=orig;b.disabled=false;alert(e.message||"The report could not be exported.")}finally{$("pdf").style.display="none"}
+  b.disabled=true;
+  b.textContent="Preparing 1-page PDF...";
+
+  const canvasReady = await loadScript(
+    [
+      "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+      "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+      "https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"
+    ],
+    ()=>typeof window.html2canvas==="function"
+  );
+
+  if(!canvasReady){
+    throw new Error("The PDF renderer could not be loaded. Please refresh the page and try again.");
+  }
+
+  const pdfReady = await loadScript(
+    [
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+      "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+      "https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    ],
+    ()=>window.jspdf && typeof window.jspdf.jsPDF==="function"
+  );
+
+  if(!pdfReady){
+    throw new Error("The PDF generator could not be loaded. Please refresh the page and try again.");
+  }
+
+  buildPdf();
+
+  const report=$("pdf");
+  report.style.display="block";
+  report.style.visibility="visible";
+  report.style.opacity="1";
+  report.style.position="fixed";
+  report.style.left="0";
+  report.style.top="0";
+  report.style.zIndex="999999";
+
+  await new Promise(resolve=>setTimeout(resolve,300));
+
+  if(document.fonts && document.fonts.ready){
+    try{ await document.fonts.ready; }catch(_){}
+  }
+
+  await new Promise(resolve =>
+    requestAnimationFrame(() =>
+      requestAnimationFrame(resolve)
+    )
+  );
+
+  const canvas=await html2canvas(report,{
+    scale:2,
+    width:794,
+    height:1123,
+    windowWidth:794,
+    windowHeight:1123,
+    backgroundColor:"#f8fbfa",
+    useCORS:false,
+    allowTaint:false,
+    logging:false,
+    imageTimeout:0,
+    scrollX:0,
+    scrollY:0
+  });
+
+  if(!canvas || canvas.width<500 || canvas.height<700){
+    throw new Error("The report could not be rendered for PDF export.");
+  }
+
+  const image=canvas.toDataURL("image/jpeg",0.98);
+
+  if(!image || image.length<5000){
+    throw new Error("The rendered report is empty.");
+  }
+
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({
+    orientation:"portrait",
+    unit:"mm",
+    format:"a4",
+    compress:true
+  });
+
+  pdf.addImage(
+    image,
+    "JPEG",
+    0,
+    0,
+    210,
+    297,
+    undefined,
+    "FAST"
+  );
+
+  const filename=
+    "L&D_Action_Plan_"+safe(window.plan.title)+".pdf";
+
+  /*
+    First try the same browser-native jsPDF save() mechanism that is
+    broadly compatible with GitHub Pages. If that path is unavailable,
+    fall back to a Blob download.
+  */
+  if(typeof pdf.save==="function"){
+    pdf.save(filename);
+  }else{
+    const blob=pdf.output("blob");
+
+    if(!blob || blob.size<5000){
+      throw new Error("The generated PDF is empty.");
+    }
+
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+
+    link.href=url;
+    link.download=filename;
+    link.rel="noopener";
+    link.style.display="none";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }
+
+  b.textContent="Report Downloaded ✓";
+
+  setTimeout(()=>{
+    b.textContent=orig;
+    b.disabled=false;
+  },2200);
+
+ }catch(e){
+  console.error("Action Planner PDF export error:",e);
+  b.textContent=orig;
+  b.disabled=false;
+  alert(e.message || "The report could not be exported.");
+ }finally{
+  const report=$("pdf");
+  report.style.display="none";
+  report.style.visibility="hidden";
+  report.style.opacity="0";
+  report.style.position="absolute";
+  report.style.left="0";
+  report.style.top="0";
+  report.style.zIndex="";
+ }
 }
+
 function safe(v){return String(v||"report").replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").toLowerCase()||"report"}
 function loadScript(urls,ready){return(async()=>{if(ready())return true;for(const u of urls){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=u;s.async=true;let d=false;const f=v=>{if(d)return;d=true;res(v)};s.onload=()=>f(true);s.onerror=()=>f(false);document.head.appendChild(s);setTimeout(()=>f(false),10000)});if(ok&&ready())return true}return false})()}
 $("generate").addEventListener("click",build);$("export").addEventListener("click",exportPdf);
