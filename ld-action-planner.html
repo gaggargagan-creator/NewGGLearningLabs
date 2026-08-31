@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GG LearnLabs | L&D Action Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#091111;--panel:#101b1b;--panel2:#132121;--text:#edf4f2;--head:#f7faf9;--muted:#91a3a0;--line:rgba(188,220,214,.14);--teal:#55dfc7;--amber:#f2b75e;--red:#ff7070}
+html[data-theme=light]{--bg:#f3f7f6;--panel:#fff;--panel2:#f5faf8;--text:#172522;--head:#172522;--muted:#647571;--line:rgba(23,37,34,.14);--teal:#159d8a;--amber:#c98518;--red:#c85656}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at 8% 0%,rgba(85,223,199,.14),transparent 28%),radial-gradient(circle at 94% 16%,rgba(242,183,94,.1),transparent 24%),var(--bg)}.grid{position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px}.app{position:relative;z-index:1;max-width:1180px;margin:auto;padding:0 25px 70px}header{height:88px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.brand{color:var(--text);text-decoration:none;font:700 21px Inter,sans-serif;letter-spacing:-.04em}.brand em{font:600 1.05em Fraunces,Georgia,serif;font-style:normal}.head{display:flex;gap:10px;align-items:center}.btn,.theme{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:11px 16px;cursor:pointer;text-decoration:none;font:600 13px Inter,sans-serif;transition:.18s}.btn:hover,.theme:hover{border-color:var(--teal)}.btn.primary{background:var(--teal);border-color:var(--teal);color:#06201c}.theme{width:106px;display:flex;align-items:center;justify-content:space-between;padding:7px 9px}.track{width:42px;height:24px;background:rgba(127,150,145,.2);border:1px solid var(--line);border-radius:99px;position:relative}.thumb{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--teal);transition:.22s}html[data-theme=light] .thumb{transform:translateX(18px);background:var(--amber)}
+.hero{padding:54px 0 28px}.eyebrow,.mini{color:var(--teal);font:500 11px "IBM Plex Mono";letter-spacing:.14em;text-transform:uppercase}.hero h1{font:700 clamp(44px,6vw,70px)/.98 Fraunces,Georgia,serif;letter-spacing:-.04em;color:var(--head);margin:13px 0}.hero h1 em{color:var(--teal)}.hero p,.copy{max-width:900px;color:var(--muted);font-size:15px;line-height:1.75}.panel{background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 45px rgba(0,0,0,.07)}.section{padding:24px;margin-top:18px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.card{padding:22px}.field{display:flex;flex-direction:column;gap:7px;color:var(--muted);font-size:11px}select,input,textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);font:13px Inter,sans-serif;outline:none}textarea{min-height:125px;resize:vertical;line-height:1.6}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choice{padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--muted);cursor:pointer;font-size:12px;line-height:1.4}.choice input{display:none}.choice.active{border-color:var(--teal);color:var(--text);background:rgba(85,223,199,.06)}.generated{margin-top:18px}.rec{padding:24px}.rec-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.badge{padding:7px 10px;border-radius:99px;font:600 9px "IBM Plex Mono";letter-spacing:.08em}.g{color:var(--teal);border-color:rgba(85,223,199,.25);background:rgba(85,223,199,.07)}.a{color:var(--amber);border-color:rgba(242,183,94,.25);background:rgba(242,183,94,.07)}.r{color:var(--red);border-color:rgba(255,112,112,.25);background:rgba(255,112,112,.07)}.recmain{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:18px}.recbox{padding:15px;border:1px solid var(--line);border-radius:13px;background:var(--panel2)}.recbox h4,.planlabel{margin:0;font:500 9px "IBM Plex Mono";letter-spacing:.1em;color:var(--muted);text-transform:uppercase}.recbox p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.65}.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}.plan{padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.planv{margin-top:5px;color:var(--text);font-weight:700;font-size:11px;line-height:1.4}.steps{margin-top:16px}.steps ol{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.8}.actions{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:20px}.note{color:var(--muted);font-size:11px;line-height:1.55}footer{padding-top:28px;color:var(--muted);font:10px "IBM Plex Mono";letter-spacing:.08em}.hidden{display:none!important}
+#pdf{display:none;position:absolute;left:0;top:0;width:794px;height:1123px;overflow:hidden;background:#f8fbfa}.pdfpage{width:794px;height:1123px;padding:34px 36px 28px;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(135deg,#edf8f5,#f8fbfa 48%,#fff6e8);font-family:Arial,sans-serif;color:#182725}.ph{display:flex;justify-content:space-between;border-bottom:2px solid #178f7f;padding-bottom:13px}.pk{font:bold 9px Arial;color:#178f7f;letter-spacing:1.4px}.pt{font:bold 24px Arial;margin-top:4px}.pd{font:10px/1.5 Arial;color:#667774;text-align:right}.pm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.mb{background:#fff;border:1px solid #dce6e3;border-radius:9px;padding:8px}.ml{font:bold 7px Arial;color:#178f7f;letter-spacing:1px;text-transform:uppercase}.mv{font:bold 10px Arial;margin-top:3px}.hero2{display:grid;grid-template-columns:210px 1fr;gap:16px;margin-top:12px}.score{background:#173a35;color:#fff;border-radius:14px;padding:15px}.sl{font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px}.sn{font:bold 31px/1.05 Arial;margin-top:8px}.ss{font:9px/1.4 Arial;color:#d2e5e1;margin-top:4px}.pill{display:inline-block;margin-top:10px;padding:5px 9px;border-radius:99px;font:bold 8px Arial;color:#06201c}.exec{background:#fff;border:1px solid #dce6e3;border-radius:14px;padding:14px}.el{font:bold 8px Arial;color:#178f7f;letter-spacing:1px}.et{font:bold 17px Arial;margin-top:5px}.ec{font:9px/1.5 Arial;color:#5e6f6b;margin-top:6px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}.stat{background:#f2f8f6;border-radius:8px;padding:7px}.stat b{font:bold 13px Arial;color:#178f7f}.stat div{font:6.6px Arial;color:#70817d;margin-top:2px;text-transform:uppercase}.ps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}.pbox{background:#fff;border:1px solid #dce6e3;border-radius:10px;padding:10px}.pbox h4{margin:0;font:bold 7px Arial;color:#6a7b77;text-transform:uppercase;letter-spacing:.8px}.pbox p{margin:5px 0 0;font:bold 8.5px/1.35 Arial;color:#253632}.psteps{margin-top:10px;background:#fff;border:1px solid #dce6e3;border-radius:10px;padding:11px}.psteps h4{margin:0;font:bold 8px Arial;color:#178f7f;text-transform:uppercase;letter-spacing:1px}.psteps ol{margin:6px 0 0 14px;padding:0;font:8px/1.5 Arial;color:#566662}.paction{margin-top:10px;background:#173a35;color:#fff;border-radius:10px;padding:11px}.paction h4{margin:0;font:bold 8px Arial;color:#7ee8d6;letter-spacing:1px;text-transform:uppercase}.paction p{margin:4px 0 0;font:bold 10px/1.4 Arial}.pfoot{margin-top:auto;border-top:1px solid #dce6e3;padding-top:7px;display:flex;justify-content:space-between;font:7px Arial;color:#7a8986}
+@media(max-width:850px){.grid2,.recmain{grid-template-columns:1fr}.plans{grid-template-columns:1fr 1fr}.actions{align-items:flex-start;flex-direction:column}}
+@media(max-width:520px){.app{padding:0 16px 55px}.head .back{display:none}.choices,.plans{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="grid"></div><div class="app">
+<header><a class="brand" href="index.html">GG <em>LearnLabs</em></a><div class="head"><button class="theme" id="theme"><span>☀</span><span class="track"><span class="thumb"></span></span><span>☾</span></button><a class="back btn" href="index.html">← Back to Tools</a></div></header>
+<section class="hero"><div class="eyebrow">L&amp;D ACTION PLANNER</div><h1>Don't just measure.<br><em>Decide what to do next.</em></h1><p>Turn L&amp;D findings into a practical action plan. The planner helps you choose the right intervention instead of automatically defaulting to more training.</p></section>
+
+<section class="panel section">
+<div class="mini">01 — DIAGNOSE</div><h2>What needs attention?</h2><p class="copy">Start with the signal you already have. Keep the diagnosis simple and make the action specific.</p>
+<div class="grid2">
+<div class="card panel">
+<label class="field">Main issue<select id="issue">
+<option value="l1">Learner feedback is low</option><option value="tof">Trainer observation is low</option><option value="knowledge">Knowledge / assessment performance is low</option><option value="application">Learning is not being applied on the job</option><option value="attendance">Attendance / completion is low</option><option value="business">Business performance has not improved</option><option value="consistency">Training quality is inconsistent</option><option value="custom">Something else</option>
+</select></label>
+<label class="field" style="margin-top:12px">Evidence<textarea id="evidence" placeholder="Example: L1 feedback dropped and learners repeatedly mentioned pace and limited practice."></textarea></label>
+</div>
+<div class="card panel">
+<label class="field">Severity<div class="choices" id="severity">
+<label class="choice active"><input type="radio" name="sev" value="low" checked>Low — isolated</label>
+<label class="choice"><input type="radio" name="sev" value="medium">Medium — recurring</label>
+<label class="choice"><input type="radio" name="sev" value="high">High — material impact</label>
+<label class="choice"><input type="radio" name="sev" value="critical">Critical — act now</label>
+</div></label>
+<label class="field" style="margin-top:15px">Likely root cause<select id="cause">
+<option value="skill">Skill / capability gap</option><option value="knowledge">Knowledge gap</option><option value="delivery">Trainer / facilitation gap</option><option value="content">Content / curriculum gap</option><option value="process">Process / workflow issue</option><option value="tools">Tool / system constraint</option><option value="manager">Manager reinforcement gap</option><option value="motivation">Motivation / adoption issue</option><option value="unknown">Not sure yet</option>
+</select></label>
+</div>
+<div class="card panel">
+<label class="field">Action owner<select id="owner"><option>Trainer</option><option>L&amp;D</option><option>L&amp;D + Trainer</option><option>Business / Operations</option><option>People Manager</option><option>Process Owner</option><option>IT / Systems</option><option>Shared ownership</option></select></label>
+<label class="field" style="margin-top:12px">Target timeline<select id="timing"><option value="7">Within 7 days</option><option value="14">Within 14 days</option><option value="30" selected>Within 30 days</option><option value="45">Within 45 days</option><option value="60">Within 60 days</option></select></label>
+</div>
+<div class="card panel">
+<label class="field">Audience<select id="audience"><option>Learners</option><option>Trainer</option><option>L&amp;D Team</option><option>Managers</option><option>Operations</option><option>Mixed audience</option></select></label>
+<label class="field" style="margin-top:12px">Effort<select id="effort"><option value="quick">Quick fix / low effort</option><option value="balanced" selected>Balanced effort</option><option value="deep">Deeper redesign</option></select></label>
+</div>
+<div class="card panel" style="grid-column:1/-1"><label class="field">Success measure <span class="note">(optional)</span><input id="success" placeholder="Example: Next TOF score reaches 85%+"></label></div>
+</div>
+<div class="actions"><div class="note">All processing stays in the browser.</div><button class="btn primary" id="generate">Build Action Plan →</button></div>
+</section>
+
+<section class="generated hidden" id="generated">
+<div class="panel rec">
+<div class="rec-head"><div><div class="mini">02 — RECOMMENDATION</div><h2 id="recTitle">Action plan</h2></div><span class="badge g" id="badge">RECOMMENDED</span></div>
+<div class="recmain"><div class="recbox"><h4>What to do</h4><p id="action"></p></div><div class="recbox"><h4>Why this action</h4><p id="why"></p></div></div>
+<div class="plans">
+<div class="plan"><div class="planlabel">Owner</div><div class="planv" id="outOwner"></div></div>
+<div class="plan"><div class="planlabel">Timeline</div><div class="planv" id="outTiming"></div></div>
+<div class="plan"><div class="planlabel">Audience</div><div class="planv" id="outAudience"></div></div>
+<div class="plan"><div class="planlabel">Success</div><div class="planv" id="outSuccess"></div></div>
+</div>
+<div class="steps"><div class="mini">NEXT 3 STEPS</div><ol id="steps"></ol></div>
+</div>
+<div class="panel section"><div class="mini">03 — DECISION SUPPORT</div><h2 id="path">Recommended path</h2><p class="copy" id="decision"></p><div class="actions"><div class="note">Validate the root cause with your available evidence before scaling the intervention.</div><button class="btn" id="export">Export 1-page Action Plan ↓</button></div></div>
+</section>
+<footer>GG LearnLabs · L&amp;D Action Planner · Measure → Understand → Decide → Act</footer>
+</div>
+<div id="pdf"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const library={
+l1:{title:"Improve learner experience",action:"Review the learner feedback by theme and make one targeted change to content, pace, practice or facilitation. Do not redesign the full program unless the evidence supports it.",why:"Low learner feedback is a signal to investigate the experience. The best next step is linked to the specific low-rated area and learner comments.",steps:["Review the lowest-rated feedback theme and a few representative comments.","Choose one change for the next delivery and brief the trainer.","Recheck the same feedback signal after the next run."],measure:"Next L1 score or target item improves.",path:"Targeted learner-experience improvement"},
+tof:{title:"Coach the trainer on the observed gap",action:"Run a short coaching conversation focused on the lowest TOF area. Practise one or two behaviours and observe them again.",why:"A trainer observation gap is usually best addressed through specific behavioural coaching and follow-up observation.",steps:["Identify the lowest TOF area and the observed behaviour.","Coach and practise one behaviour for the next session.","Repeat the observation and compare the same area."],measure:"Next TOF reaches the agreed target.",path:"Targeted trainer coaching"},
+knowledge:{title:"Strengthen the specific learning gap",action:"Identify the weakest knowledge area and add one focused reinforcement activity such as a short practice, job aid or knowledge check.",why:"A specific knowledge gap is better addressed with targeted reinforcement than repeating the whole program.",steps:["Identify the weakest topic or objective.","Create one short reinforcement activity.","Check the same topic again after reinforcement."],measure:"Targeted assessment performance improves.",path:"Focused knowledge reinforcement"},
+application:{title:"Build support for workplace application",action:"Define the behaviour that should change after training, provide a practical job aid or task, and involve the manager in checking application.",why:"When learning is not applied, the barrier may be opportunity, reinforcement or manager support rather than lack of training.",steps:["Define the one behaviour or task expected.","Provide a practical task, job aid or practice opportunity.","Ask the manager to review application after the target period."],measure:"Observed application reaches the agreed target.",path:"Workplace transfer support"},
+attendance:{title:"Remove the completion barrier",action:"Identify the main reason learners are not completing the program and remove the biggest barrier first—scheduling, access, manager release, technology or communication.",why:"Low completion is often a participation problem before it is a learning problem.",steps:["Segment non-completion by reason or learner group.","Remove the most common operational barrier.","Monitor completion in the next cycle."],measure:"Completion improves versus the previous cycle.",path:"Completion barrier removal"},
+business:{title:"Connect learning to the business outcome",action:"Clarify the business behaviour or metric the training should influence, then test the smallest intervention that can improve that behaviour.",why:"A business-performance gap should not automatically be treated as a training gap.",steps:["Define the business metric and linked learner behaviour.","Check whether the barrier is skill, knowledge, process or manager support.","Pilot one targeted intervention and review the business signal."],measure:"Selected business metric or leading indicator improves.",path:"Business-impact intervention"},
+consistency:{title:"Standardise the critical delivery elements",action:"Identify the parts of delivery that vary most and standardise the essentials such as preparation, flow, examples, activities and follow-up.",why:"Inconsistent quality improves when the critical elements are repeatable without removing trainer flexibility.",steps:["Identify the biggest sources of variation.","Create a lightweight standard or checklist.","Review the next deliveries and refine the standard."],measure:"Variation between sessions or trainers reduces.",path:"Delivery consistency improvement"},
+custom:{title:"Diagnose before acting",action:"Clarify the problem, gather enough evidence to identify the likely cause, and select the smallest intervention that can test the hypothesis.",why:"When the problem is unclear, a short diagnostic is safer than launching another training intervention.",steps:["Write the problem in observable terms.","Review evidence and identify the most likely cause.","Run a small intervention and check whether the signal changes."],measure:"Agreed problem indicator moves in the desired direction.",path:"Rapid diagnosis + targeted action"}
+};
+function sev(){return document.querySelector('input[name=sev]:checked')?.value||"low"}
+document.querySelectorAll(".choice input").forEach(x=>x.addEventListener("change",()=>document.querySelectorAll(".choice").forEach(c=>c.classList.toggle("active",c.querySelector("input").checked))));
+function build(){
+ const issue=$("issue").value,cause=$("cause").value,level=sev(),owner=$("owner").value,timing=$("timing").value,audience=$("audience").value,effort=$("effort").value,custom=norm($("success").value),r=library[issue];
+ let action=r.action,why=r.why;
+ if(cause==="process")why+=" Check the workflow before adding training.";
+ if(cause==="tools")why+=" Remove the system or access barrier before changing the learning content.";
+ if(cause==="manager")why+=" Include manager reinforcement in the follow-through.";
+ if(cause==="delivery")why+=" Make the coaching behaviour-specific.";
+ if(cause==="content")why+=" Review the relevant activity or content before redesigning everything.";
+ if(cause==="knowledge")why+=" Target the exact knowledge gap.";
+ if(cause==="skill")why+=" Include guided practice, not just explanation.";
+ if(effort==="quick")action+=" Keep the first intervention small and testable.";
+ if(effort==="deep")action+=" Use the first intervention as the input to a deeper redesign if the signal remains unchanged.";
+ $("recTitle").textContent=r.title+(level==="high"||level==="critical"?" — priority action":"");
+ $("badge").textContent=level==="critical"?"ACT NOW":level==="high"?"HIGH PRIORITY":level==="medium"?"PRIORITISE":"RECOMMENDED";
+ $("badge").className="badge "+(level==="critical"||level==="high"?"r":level==="medium"?"a":"g");
+ $("action").textContent=action;$("why").textContent=why;$("outOwner").textContent=owner;$("outTiming").textContent="Within "+timing+" days";$("outAudience").textContent=audience;$("outSuccess").textContent=custom||r.measure;$("steps").innerHTML=r.steps.map(s=>"<li>"+esc(s)+"</li>").join("");$("path").textContent=r.path;$("decision").textContent="Start with the smallest action that addresses the likely cause. Severity is "+level+", owner is "+owner+" and the target window is "+timing+" days. Use the evidence entered to validate the recommendation before scaling it.";
+ $("generated").classList.remove("hidden");window.plan={issue,cause,level,owner,timing,audience,effort,title:r.title,action,why,path:r.path,success:custom||r.measure,evidence:norm($("evidence").value),steps:r.steps};$("generated").scrollIntoView({behavior:"smooth"});
+}
+function norm(v){return String(v||"").replace(/\\s+/g," ").trim()}
+function esc(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function label(v){return ({l1:"Learner feedback",tof:"Trainer observation",knowledge:"Knowledge / assessment",application:"On-job application",attendance:"Attendance / completion",business:"Business performance",consistency:"Training consistency",custom:"Other"})[v]||v}
+function causeLabel(v){return ({skill:"Skill / capability",knowledge:"Knowledge gap",delivery:"Trainer / facilitation",content:"Content / curriculum",process:"Process / workflow",tools:"Tool / system",manager:"Manager reinforcement",motivation:"Motivation / adoption",unknown:"Not sure yet"})[v]||v}
+function buildPdf(){
+ const p=window.plan;if(!p)throw Error("Build the action plan before exporting.");
+ const c=p.level==="critical"||p.level==="high"?"#c85656":p.level==="medium"?"#c98518":"#178f7f";
+ $("pdf").innerHTML='<div class="pdfpage"><div class="ph"><div><div class="pk">GG LEARNLABS · LEARNING & DEVELOPMENT</div><div class="pt">L&D Action Plan</div></div><div class="pd"><b>'+esc(label(p.issue))+'</b><br>'+esc(p.owner)+' · '+esc(p.timing)+' days</div></div><div class="pm"><div class="mb"><div class="ml">Severity</div><div class="mv" style="color:'+c+'">'+esc(p.level.toUpperCase())+'</div></div><div class="mb"><div class="ml">Root cause</div><div class="mv">'+esc(causeLabel(p.cause))+'</div></div><div class="mb"><div class="ml">Audience</div><div class="mv">'+esc(p.audience)+'</div></div><div class="mb"><div class="ml">Effort</div><div class="mv">'+esc(p.effort)+'</div></div></div><div class="hero2"><div class="score"><div class="sl">RECOMMENDED PATH</div><div class="sn">'+esc(p.path)+'</div><div class="ss">Decision aid · validate with evidence</div><div class="pill" style="background:'+c+'">'+esc(p.level==="critical"?"ACT NOW":p.level==="high"?"HIGH PRIORITY":p.level==="medium"?"PRIORITISE":"RECOMMENDED")+'</div></div><div class="exec"><div class="el">WHAT TO DO</div><div class="et">'+esc(p.title)+'</div><div class="ec">'+esc(p.action)+'</div><div class="stats"><div class="stat"><b>'+esc(p.owner)+'</b><div>OWNER</div></div><div class="stat"><b>'+esc(p.timing)+'d</b><div>TIMELINE</div></div><div class="stat"><b>'+esc(p.audience)+'</b><div>AUDIENCE</div></div></div></div></div><div class="pdf-section"><b>Decision logic</b><span>Issue → cause → action</span></div><div class="ps"><div class="pbox"><h4>Issue</h4><p>'+esc(label(p.issue))+'</p></div><div class="pbox"><h4>Likely cause</h4><p>'+esc(causeLabel(p.cause))+'</p></div><div class="pbox"><h4>Why this path</h4><p>'+esc(p.why)+'</p></div></div><div class="pbox" style="margin-top:10px"><h4>Success measure</h4><p>'+esc(p.success)+'</p></div><div class="psteps"><h4>Next 3 steps</h4><ol>'+p.steps.map(s=>"<li>"+esc(s)+"</li>").join("")+'</ol></div><div class="pbox" style="margin-top:10px;min-height:72px"><h4>Evidence entered</h4><p>'+esc(p.evidence||"No evidence entered. Validate the recommendation with the available L&D data.")+'</p></div><div class="paction"><h4>L&D PRINCIPLE</h4><p>Use the smallest intervention that addresses the likely cause, then measure whether the signal changes.</p></div><div class="pfoot"><span>GG LearnLabs · L&D Action Planner</span><span>Measure → Understand → Decide → Act</span></div></div>';
+}
+async function exportPdf(){
+ const b=$("export"),orig=b.textContent;
+ try{
+  b.disabled=true;b.textContent="Preparing 1-page PDF...";
+  if(!(await loadScript(["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js","https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"],()=>typeof window.html2canvas==="function")))throw Error("PDF renderer could not be loaded.");
+  if(!(await loadScript(["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js","https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"],()=>window.jspdf&&typeof window.jspdf.jsPDF==="function")))throw Error("PDF generator could not be loaded.");
+  buildPdf();const r=$("pdf");r.style.display="block";await new Promise(x=>setTimeout(x,250));
+  const canvas=await html2canvas(r,{scale:2,width:794,height:1123,windowWidth:794,windowHeight:1123,backgroundColor:"#f8fbfa",useCORS:false,logging:false});
+  const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});pdf.addImage(canvas.toDataURL("image/jpeg",.98),"JPEG",0,0,210,297,undefined,"FAST");
+  const blob=pdf.output("blob"),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="L&D_Action_Plan_"+safe(p.title)+".pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  b.textContent="Report Downloaded ✓";setTimeout(()=>{b.textContent=orig;b.disabled=false},2000);
+ }catch(e){console.error(e);b.textContent=orig;b.disabled=false;alert(e.message||"The report could not be exported.")}finally{$("pdf").style.display="none"}
+}
+function safe(v){return String(v||"report").replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").toLowerCase()||"report"}
+function loadScript(urls,ready){return(async()=>{if(ready())return true;for(const u of urls){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=u;s.async=true;let d=false;const f=v=>{if(d)return;d=true;res(v)};s.onload=()=>f(true);s.onerror=()=>f(false);document.head.appendChild(s);setTimeout(()=>f(false),10000)});if(ok&&ready())return true}return false})()}
+$("generate").addEventListener("click",build);$("export").addEventListener("click",exportPdf);
+$("theme").addEventListener("click",()=>{const l=document.documentElement.getAttribute("data-theme")==="light";document.documentElement.setAttribute("data-theme",l?"dark":"light");localStorage.setItem("ggActionTheme",l?"dark":"light")});
+document.documentElement.setAttribute("data-theme",localStorage.getItem("ggActionTheme")==="light"?"light":"dark");
+</script>
+</body>
+</html>
